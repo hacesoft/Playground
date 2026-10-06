@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t } from './i18n'
+
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import RuntimeChecks from './RuntimeChecks.vue'
@@ -37,36 +39,36 @@ const tests = ref<TestResult[]>(createTests())
 const workspacePreview = ref<HTMLElement | null>(null)
 const previewSize = ref<'auto' | 'desktop' | 'tablet' | 'mobile'>('auto')
 const workspaceMetrics = ref<WorkspaceMetrics | null>(null)
-const dialogResult = ref('Zatím nebyla provedena žádná akce.')
+const dialogResult = ref(t("No action has been performed yet."))
 const toolbarDemo = ref<HTMLElement | null>(null)
-const toolbarResult = ref('Zatím nebyla vybrána žádná akce.')
+const toolbarResult = ref(t("No action has been selected yet."))
 const settingsFormHost = ref<HTMLElement | null>(null)
-const settingsResult = ref('Načítám uložené nastavení…')
+const settingsResult = ref(t("Loading saved settings…"))
 const pickerHost = ref<HTMLElement | null>(null)
-const pickerResult = ref('Není vybrán žádný uživatel ani skupina.')
+const pickerResult = ref(t("No user or group selected."))
 const layoutPreview = ref<HTMLElement | null>(null)
 const layoutMetrics = ref<LayoutMetrics | null>(null)
 const aboutHost = ref<HTMLElement | null>(null)
 const mapHost = ref<HTMLElement | null>(null)
-const mapViewport = ref('čekám')
+const mapViewport = ref(t("waiting"))
 const mapProviders = ref<Array<{ id: string; name: string; configured: boolean; enabled: boolean }>>([])
 const mapDiagnostics = ref<{ rateLimitedRequests?: number; limiterUnavailableRequests?: number; providerErrors?: number; requests: number; cacheHits: number; cacheMisses: number; externalRequests: number; savedExternalRequests: number; cacheBytes: number; cacheLimitBytes: number; cacheFreeBytes: number; cacheUsagePercent: number; cacheEntryCount: number; cacheOldestStoredAt: string | null; cacheNewestStoredAt: string | null; tileCacheTtlSeconds: number; browserCacheTtlSeconds: number; lastProviderError: string; canManage: boolean } | null>(null)
 const mapDiagnosticsError = ref('')
 const editorHost = ref<HTMLElement | null>(null)
 const editorLabels: Record<string, string> = {
-  Formatting: 'Formátování', Document: 'Dokument', Preview: 'Náhled',
-  Undo: 'Zpět', Redo: 'Znovu', Heading: 'Nadpis', Bold: 'Tučné', Italic: 'Kurzíva',
-  Underline: 'Podtržené', Strikethrough: 'Přeškrtnuté', Highlight: 'Zvýraznění',
-  'Bullet list': 'Odrážky', 'Numbered list': 'Číslovaný seznam', Checklist: 'Zaškrtávací seznam',
-  Quote: 'Citace', 'Inline code': 'Kód v textu', 'Code block': 'Blok kódu', Table: 'Tabulka',
-  Link: 'Odkaz', 'Image URL': 'Adresa obrázku', 'Insert image': 'Vložit obrázek',
-  'Emoji library': 'Knihovna emoji', 'Emoji category': 'Kategorie emoji', 'All emoji': 'Všechna emoji', 'Find emoji': 'Hledat emoji', 'Free image libraries': 'Knihovny volných obrázků', 'Image source': 'Zdroj obrázků', 'Search free images': 'Hledat volné obrázky', 'Text color': 'Barva textu', Font: 'Písmo', Search: 'Hledat', Source: 'Zdroj', Separator: 'Oddělovač', Image: 'Obrázek',
+  Formatting: t("Formatting"), Document: t("Document"), Preview: t("Preview"),
+  Undo: t("Undo"), Redo: t("Redo"), Heading: t("Heading"), Bold: t("Bold"), Italic: t("Italic"),
+  Underline: t("Underline"), Strikethrough: t("Strikethrough"), Highlight: t("Highlight"),
+  'Bullet list': t("Bullet list"), 'Numbered list': t("Numbered list"), Checklist: t("Checklist"),
+  Quote: t("Quote"), 'Inline code': t("Inline code"), 'Code block': t("Code block"), Table: t("Table"),
+  Link: t("Link"), 'Image URL': t("Image URL"), 'Insert image': t("Insert image"),
+  'Emoji library': t("Emoji library"), 'Emoji category': t("Emoji category"), 'All emoji': t("All emoji"), 'Find emoji': t("Find emoji"), 'Free image libraries': t("Free image libraries"), 'Image source': t("Image source"), 'Search free images': t("Search free images"), 'Text color': t("Text color"), Font: t("Font"), Search: t("Search"), Source: t("Source"), Separator: t("Separator"), Image: t("Image"),
 }
 const backgroundHost = ref<HTMLElement | null>(null)
-const backgroundStatus = ref('Pozadí čeká na načtení.')
+const backgroundStatus = ref(t("Waiting to load the background."))
 const backgroundMode = ref<'none' | 'solid' | 'gradient'>('none')
 let backgroundController: { load(): Promise<{ mode: string }>; save(choice: { mode: 'none' } | { mode: 'solid' | 'gradient'; color: string }): Promise<void>; destroy(): void } | null = null
-const listsStatus = ref('Seznamy čekají na načtení.')
+const listsStatus = ref(t("Waiting to load lists."))
 const sharedLists = ref<Array<{ id: string; title: string; permission: string; archived: boolean; position: number; parent_id: string | null }>>([])
 const activeListId = ref('')
 const sharedPlaces = ref<Array<{ id: string; name: string; lat: number; lon: number; position: number }>>([])
@@ -87,13 +89,13 @@ async function loadLists(): Promise<void> {
     sharedLists.value = await core.lists.list('map_places')
     if (!sharedLists.value.some(list => list.id === activeListId.value)) activeListId.value = sharedLists.value[0]?.id ?? ''
     sharedPlaces.value = activeListId.value ? await core.lists.places('map_places', activeListId.value) : []
-    listsStatus.value = 'Načteno ze služby Core. Import starých míst se provede při prvním načtení.'
+    listsStatus.value = t("Loaded from Core. Old places are imported on the first load.")
   } catch (error) { listsStatus.value = error instanceof Error ? error.message : String(error) }
 }
 
 async function createDemoList(): Promise<void> {
   try {
-    const item = await window.HcSharedAppCore!.lists.create('map_places', 'Ukázkový seznam')
+    const item = await window.HcSharedAppCore!.lists.create('map_places', t("Example list"))
     activeListId.value = item.id; await loadLists()
   } catch (error) { listsStatus.value = error instanceof Error ? error.message : String(error) }
 }
@@ -101,7 +103,7 @@ async function createDemoList(): Promise<void> {
 async function createDemoChild(): Promise<void> {
   if (!activeListId.value || sharedLists.value.find(item => item.id === activeListId.value)?.permission !== 'owner') return
   try {
-    const item = await window.HcSharedAppCore!.lists.create('map_places', 'Podseznam', 0, activeListId.value)
+    const item = await window.HcSharedAppCore!.lists.create('map_places', t("Sublist"), 0, activeListId.value)
     activeListId.value = item.id; await loadLists()
   } catch (error) { listsStatus.value = error instanceof Error ? error.message : String(error) }
 }
@@ -110,14 +112,14 @@ async function shareDemoPlace(permission: 'read' | 'edit'): Promise<void> {
   if (!activeListId.value || !sharedPlaces.value.length || !pickerController) return
   try {
     for (const target of pickerController.selected()) await window.HcSharedAppCore!.lists.sharePlace('map_places', activeListId.value, sharedPlaces.value[0]!.id, target.type, target.id, permission)
-    listsStatus.value = 'Sdíleno pouze vybrané místo, nikoli celý seznam.'
+    listsStatus.value = t("Only the selected place was shared, not the entire list.")
   } catch (error) { listsStatus.value = error instanceof Error ? error.message : String(error) }
 }
 
 async function addDemoPlace(): Promise<void> {
   if (!activeListId.value) return
   try {
-    await window.HcSharedAppCore!.lists.addPlace('map_places', activeListId.value, { name: 'Praha', lat: 50.087, lon: 14.421, note: '', color: '#3388ff', position: sharedPlaces.value.length })
+    await window.HcSharedAppCore!.lists.addPlace('map_places', activeListId.value, { name: t("Prague"), lat: 50.087, lon: 14.421, note: '', color: '#3388ff', position: sharedPlaces.value.length })
     await loadLists()
   } catch (error) { listsStatus.value = error instanceof Error ? error.message : String(error) }
 }
@@ -126,7 +128,7 @@ async function grantSelected(permission: 'read' | 'edit'): Promise<void> {
   if (!activeListId.value || !pickerController) return
   try {
     for (const target of pickerController.selected()) await window.HcSharedAppCore!.lists.share('map_places', activeListId.value, target.type, target.id, permission)
-    listsStatus.value = 'Sdílení bylo uloženo. Příjemce uvidí seznam po přihlášení.'
+    listsStatus.value = t("Sharing saved. The recipient will see the list after signing in.")
   } catch (error) { listsStatus.value = error instanceof Error ? error.message : String(error) }
 }
 
@@ -142,7 +144,7 @@ async function saveBackground(): Promise<void> {
   try {
     const choice = backgroundMode.value === 'none' ? { mode: 'none' as const } : { mode: backgroundMode.value, color: '#b8dbf6' }
     await backgroundController.save(choice)
-    backgroundStatus.value = 'Pozadí je uloženo v uživatelském nastavení.'
+    backgroundStatus.value = t("Background saved in user settings.")
   } catch (error) { backgroundStatus.value = error instanceof Error ? error.message : String(error) }
 }
 
@@ -160,26 +162,26 @@ async function loadMapDiagnostics(): Promise<void> {
 
 const passedCount = computed(() => tests.value.filter((test) => test.state === 'passed').length)
 const allPassed = computed(() => passedCount.value === tests.value.length)
-const loadedCoreVersion = computed(() => window.HcSharedAppCore?.version ?? 'nenalezeno')
+const loadedCoreVersion = computed(() => window.HcSharedAppCore?.version ?? t("not found"))
 
 function createTests(): TestResult[] {
   return [
-    { id: 'global', name: 'Načtení Core', detail: 'Čeká na spuštění', state: 'waiting' },
-    { id: 'api', name: 'Stavové API', detail: 'Čeká na spuštění', state: 'waiting' },
-    { id: 'version', name: 'Kompatibilita verze', detail: 'Čeká na spuštění', state: 'waiting' },
-    { id: 'events', name: 'EventBus', detail: 'Čeká na spuštění', state: 'waiting' },
-    { id: 'config', name: 'Config', detail: 'Čeká na spuštění', state: 'waiting' },
-    { id: 'logger', name: 'Logger', detail: 'Čeká na spuštění', state: 'waiting' },
-    { id: 'workspace', name: 'Responsive Workspace', detail: 'Čeká na spuštění', state: 'waiting' },
-    { id: 'dialogs', name: 'Dialog Engine', detail: 'Čeká na spuštění', state: 'waiting' },
-    { id: 'notifications', name: 'Notification Manager', detail: 'Čeká na spuštění', state: 'waiting' },
-    { id: 'toolbar', name: 'Toolbar', detail: 'Čeká na spuštění', state: 'waiting' },
-    { id: 'forms', name: 'Form Engine', detail: 'Čeká na spuštění', state: 'waiting' },
-    { id: 'settings', name: 'Settings Service', detail: 'Čeká na spuštění', state: 'waiting' },
-    { id: 'picker', name: 'User/Group Picker', detail: 'Čeká na spuštění', state: 'waiting' },
-    { id: 'layout', name: 'Layout Primitives', detail: 'Čeká na spuštění', state: 'waiting' },
-    { id: 'about', name: 'About & Updates', detail: 'Čeká na spuštění', state: 'waiting' },
-    { id: 'maps', name: 'Core Maps', detail: 'Čeká na spuštění', state: 'waiting' },
+    { id: 'global', name: t("Load Core"), detail: t("Waiting to start"), state: 'waiting' },
+    { id: 'api', name: t("Status API"), detail: t("Waiting to start"), state: 'waiting' },
+    { id: 'version', name: t("Version compatibility"), detail: t("Waiting to start"), state: 'waiting' },
+    { id: 'events', name: 'EventBus', detail: t("Waiting to start"), state: 'waiting' },
+    { id: 'config', name: 'Config', detail: t("Waiting to start"), state: 'waiting' },
+    { id: 'logger', name: 'Logger', detail: t("Waiting to start"), state: 'waiting' },
+    { id: 'workspace', name: 'Responsive Workspace', detail: t("Waiting to start"), state: 'waiting' },
+    { id: 'dialogs', name: 'Dialog Engine', detail: t("Waiting to start"), state: 'waiting' },
+    { id: 'notifications', name: 'Notification Manager', detail: t("Waiting to start"), state: 'waiting' },
+    { id: 'toolbar', name: 'Toolbar', detail: t("Waiting to start"), state: 'waiting' },
+    { id: 'forms', name: 'Form Engine', detail: t("Waiting to start"), state: 'waiting' },
+    { id: 'settings', name: 'Settings Service', detail: t("Waiting to start"), state: 'waiting' },
+    { id: 'picker', name: 'User/Group Picker', detail: t("Waiting to start"), state: 'waiting' },
+    { id: 'layout', name: 'Layout Primitives', detail: t("Waiting to start"), state: 'waiting' },
+    { id: 'about', name: 'About & Updates', detail: t("Waiting to start"), state: 'waiting' },
+    { id: 'maps', name: 'Core Maps', detail: t("Waiting to start"), state: 'waiting' },
   ]
 }
 
@@ -189,7 +191,7 @@ function setResult(id: string, state: TestResult['state'], detail: string): void
 }
 
 async function execute(id: string, action: () => void | Promise<void>): Promise<void> {
-  setResult(id, 'running', 'Probíhá test…')
+  setResult(id, 'running', t("Testing…"))
   try {
     await action()
   } catch (error) {
@@ -205,12 +207,12 @@ async function runTests(): Promise<void> {
 
   const core = window.HcSharedAppCore
   await execute('global', () => {
-    if (!core) throw new Error('Globální API window.HcSharedAppCore nebylo nalezeno.')
+    if (!core) throw new Error(t("Global API window.HcSharedAppCore was not found."))
     setResult('global', 'passed', 'Core ' + core.version + ', API ' + core.apiVersion)
   })
 
   await execute('api', async () => {
-    if (!props.coreStatusUrl) throw new Error('Chybí URL stavového API.')
+    if (!props.coreStatusUrl) throw new Error(t("Status API URL is missing."))
     const separator = props.coreStatusUrl.includes('?') ? '&' : '?'
     const response = await fetch(props.coreStatusUrl + separator + '_core=' + Date.now(), {
       credentials: 'same-origin',
@@ -219,18 +221,18 @@ async function runTests(): Promise<void> {
     })
     if (!response.ok) throw new Error('HTTP ' + response.status)
     const status = await response.json() as StatusResponse
-    if (status.app !== 'hc_shared_app_core' || status.contract !== 'hc-shared-app-core-v1' || status.apiVersion !== 1) throw new Error('Neplatný veřejný kontrakt Core.')
-    if (status.nextcloud?.min !== 35 || status.nextcloud?.max !== 35) throw new Error('Core nehlásí očekávaný rozsah NC35.')
+    if (status.app !== 'hc_shared_app_core' || status.contract !== 'hc-shared-app-core-v1' || status.apiVersion !== 1) throw new Error(t("Invalid public Core contract."))
+    if (status.nextcloud?.min !== 35 || status.nextcloud?.max !== 35) throw new Error(t("Core does not report the expected NC35 range."))
     serverStatus.value = status
     if (core && status.version !== core.version) {
-      throw new Error('Backend ' + status.version + ' a frontend ' + core.version + ' se neshodují.')
+      throw new Error('Backend ' + status.version + ' a frontend ' + core.version + t(" do not match."))
     }
-    setResult('api', 'passed', 'Backend hc_shared_app_core ' + status.version + ' odpovídá.')
+    setResult('api', 'passed', 'Backend hc_shared_app_core ' + status.version + t(" responds."))
   })
 
   if (!core) {
     for (const id of ['version', 'events', 'config', 'logger', 'workspace', 'dialogs', 'notifications', 'toolbar', 'forms', 'settings', 'picker', 'layout', 'about', 'maps']) {
-      setResult(id, 'failed', 'Core není načtené.')
+      setResult(id, 'failed', t("Core is not loaded."))
     }
     running.value = false
     return
@@ -238,7 +240,7 @@ async function runTests(): Promise<void> {
 
   await execute('version', () => {
     core.assertCompatible(props.requiredCoreVersion)
-    setResult('version', 'passed', 'Požadavek ≥ ' + props.requiredCoreVersion + ' splněn.')
+    setResult('version', 'passed', t("Requirement ≥ ") + props.requiredCoreVersion + t(" met."))
   })
 
   await execute('events', () => {
@@ -248,99 +250,99 @@ async function runTests(): Promise<void> {
     })
     core.events.emit('playground:self-test', { value: 'OK' })
     unsubscribe()
-    if (!received.includes('OK')) throw new Error('Událost nebyla správně doručena.')
-    setResult('events', 'passed', 'Událost doručena a listener odpojen.')
+    if (!received.includes('OK')) throw new Error(t("The event was not delivered correctly."))
+    setResult('events', 'passed', t("Event delivered and listener detached."))
   })
 
   await execute('config', () => {
     core.config.set('playground.selfTest', 'OK')
     if (core.config.get<string>('playground.selfTest', '') !== 'OK') {
-      throw new Error('Uložená hodnota nebyla vrácena.')
+      throw new Error(t("The stored value was not returned."))
     }
-    setResult('config', 'passed', 'Zápis a čtení hodnoty funguje.')
+    setResult('config', 'passed', t("Writing and reading values works."))
   })
 
   await execute('logger', () => {
     core.logger.info('Playground self-test completed.', { version: props.playgroundVersion })
-    setResult('logger', 'passed', 'Zpráva zapsána do konzole prohlížeče.')
+    setResult('logger', 'passed', t("Message written to the browser console."))
   })
 
   await execute('workspace', async () => {
     await nextTick()
-    if (!workspacePreview.value) throw new Error('Ukázkový workspace nebyl nalezen.')
+    if (!workspacePreview.value) throw new Error(t("Example workspace was not found."))
     workspaceController?.destroy()
     workspaceController = core.workspace.observe(workspacePreview.value, (metrics) => {
       workspaceMetrics.value = metrics
     })
     const metrics = workspaceController.refresh()
     if (!['mobile', 'tablet', 'desktop'].includes(metrics.mode)) {
-      throw new Error('Workspace vrátil neplatný režim.')
+      throw new Error(t("Workspace returned an invalid mode."))
     }
-    setResult('workspace', 'passed', 'Observer aktivní, režim ' + metrics.mode + '.')
+    setResult('workspace', 'passed', t("Observer active, mode ") + metrics.mode + '.')
   })
 
   await execute('dialogs', async () => {
     const dialog = core.dialogs.open({
-      title: 'Automatický test',
-      content: 'Dialog je funkční.',
+      title: t("Automatic test"),
+      content: t("Dialog works."),
     })
     dialog.close('programmatic')
     if (await dialog.closed !== 'programmatic') {
-      throw new Error('Dialog se neuzavřel očekávaným způsobem.')
+      throw new Error(t("The dialog did not close as expected."))
     }
-    setResult('dialogs', 'passed', 'Otevření, stack a zavření fungují.')
+    setResult('dialogs', 'passed', t("Opening, stacking and closing works."))
   })
 
   await execute('notifications', async () => {
-    const notification = core.notifications.info('Automatický test', { persistent: true })
+    const notification = core.notifications.info(t("Automatic test"), { persistent: true })
     notification.dismiss()
     if (await notification.closed !== 'dismiss') {
-      throw new Error('Oznámení se neuzavřelo očekávaným způsobem.')
+      throw new Error(t("The notification did not close as expected."))
     }
-    setResult('notifications', 'passed', 'Zobrazení, deduplikace a zavření fungují.')
+    setResult('notifications', 'passed', t("Display, deduplication and closing works."))
   })
 
   await execute('toolbar', () => {
-    if (!toolbarDemo.value) throw new Error('Ukázkový toolbar nebyl nalezen.')
+    if (!toolbarDemo.value) throw new Error(t("Example toolbar was not found."))
     if (!toolbarDemo.value.querySelector('[data-toolbar-action="add"]')) {
-      throw new Error('Akce toolbaru nebyla vykreslena.')
+      throw new Error(t("Toolbar action was not rendered."))
     }
     toolbarController?.setDisabled('filter', true)
     toolbarController?.setDisabled('filter', false)
-    setResult('toolbar', 'passed', 'Akce, stav tlačítek a mobilní režim fungují.')
+    setResult('toolbar', 'passed', t("Actions, button states and mobile mode work."))
   })
 
   await execute('forms', () => {
     if (!formController || !settingsFormHost.value?.querySelector('[name="location"]')) {
-      throw new Error('Formulářová pole nebyla vykreslena.')
+      throw new Error(t("Form fields were not rendered."))
     }
-    if (!formController.validate()) throw new Error('Výchozí formulář není platný.')
-    setResult('forms', 'passed', 'Pole, hodnoty a validace fungují.')
+    if (!formController.validate()) throw new Error(t("The default form is invalid."))
+    setResult('forms', 'passed', t("Fields, values and validation work."))
   })
 
   await execute('settings', async () => {
-    if (!props.coreSettingsUrl) throw new Error('Chybí URL settings API.')
+    if (!props.coreSettingsUrl) throw new Error(t("Settings API URL is missing."))
     const oClient = core.settings.create(props.coreSettingsUrl, 'hc_shared_app_core_playground')
     const oValues = await oClient.load()
     formController?.setValues(oValues as Record<string, string | number | boolean>)
     settingsResult.value = Object.keys(oValues).length
-      ? 'Uložené nastavení bylo načteno.'
-      : 'Zatím není uloženo žádné nastavení.'
-    setResult('settings', 'passed', 'Uživatelské nastavení lze načíst ze serveru.')
+      ? t("Saved settings loaded.")
+      : t("No settings saved yet.")
+    setResult('settings', 'passed', t("User settings can be loaded from the server."))
   })
 
   await execute('picker', () => {
-    if (!props.coreShareesUrl) throw new Error('Chybí URL User/Group API.')
+    if (!props.coreShareesUrl) throw new Error(t("User/Group API URL is missing."))
     if (!pickerController || !pickerHost.value?.querySelector('input[type="search"]')) {
-      throw new Error('User/Group Picker nebyl vykreslen.')
+      throw new Error(t("User/Group Picker was not rendered."))
     }
-    setResult('picker', 'passed', 'Vyhledávání a vícenásobný výběr jsou připravené.')
+    setResult('picker', 'passed', t("Search and multiple selection are ready."))
   })
 
   await execute('layout', async () => {
     await nextTick()
     const oElement = layoutPreview.value
-    if (!oElement) throw new Error('Ukázka Layout Primitives nebyla nalezena.')
+    if (!oElement) throw new Error(t("Layout Primitives example was not found."))
     layoutController?.destroy()
     layoutController = core.layout.observe(oElement, {
       topOffset: 0,
@@ -350,28 +352,28 @@ async function runTests(): Promise<void> {
     })
     const oMetrics = layoutController.refresh('manual')
     if (!core.layout.classes.appLayout || oMetrics.availableHeight < 0) {
-      throw new Error('Veřejné Layout API vrátilo neplatný kontrakt.')
+      throw new Error(t("Public Layout API returned an invalid contract."))
     }
-    setResult('layout', 'passed', 'Kostra, scroll a resize události fungují.')
+    setResult('layout', 'passed', t("Layout, scrolling and resize events work."))
   })
 
   await execute('about', () => {
     if (!aboutController || !aboutHost.value?.querySelector('.hc-shared-app-core-about__row')) {
-      throw new Error('Společný blok O aplikaci nebyl vykreslen.')
+      throw new Error(t("The shared About panel was not rendered."))
     }
-    setResult('about', 'passed', 'Verze aplikace, Core a odkazy na GitHub jsou dostupné.')
+    setResult('about', 'passed', t("App version, Core and GitHub links are available."))
   })
 
   await execute('maps', async () => {
-    if (!mapController || !mapHost.value?.querySelector('.hc-shared-app-core-map__compass')) throw new Error('Core Maps nebylo vykresleno.')
+    if (!mapController || !mapHost.value?.querySelector('.hc-shared-app-core-map__compass')) throw new Error(t("Core Maps was not rendered."))
     const oViewport = mapController.getViewport()
-    if (oViewport.center.lat !== 49.1 || oViewport.rotationDeg !== 0) throw new Error('Mapový viewport není platný.')
+    if (oViewport.center.lat !== 49.1 || oViewport.rotationDeg !== 0) throw new Error(t("Map viewport is invalid."))
     const sTemplate = core.maps.tileTemplate('osm', 'basic', 256)
-    if (!sTemplate.includes('/api/v1/maps/tile/osm/basic/256/{z}/{x}/{y}')) throw new Error('Tile proxy šablona není platná.')
+    if (!sTemplate.includes('/api/v1/maps/tile/osm/basic/256/{z}/{x}/{y}')) throw new Error(t("Tile proxy template is invalid."))
     mapProviders.value = await core.maps.providers.list()
     await loadMapDiagnostics()
-    if (!mapDiagnostics.value) throw new Error('Diagnostiku mapové cache nelze načíst: ' + mapDiagnosticsError.value)
-    setResult('maps', 'passed', 'API viewportu, vrstev a tile URL ověřeno (bez reálného stahování); providerů: ' + mapProviders.value.length + '.')
+    if (!mapDiagnostics.value) throw new Error(t("Cannot load map cache diagnostics: ") + mapDiagnosticsError.value)
+    setResult('maps', 'passed', t("Viewport, layers and tile URL verified without downloading; providers: ") + mapProviders.value.length + '.')
   })
 
   running.value = false
@@ -388,12 +390,12 @@ function openMapCacheSettings(): void {
 
 async function showConfirmation(): Promise<void> {
   const accepted = await window.HcSharedAppCore?.dialogs.confirm({
-    title: 'Potvrzení akce',
-    message: 'Má se ukázková akce opravdu provést?',
-    confirmLabel: 'Ano, provést',
-    cancelLabel: 'Zrušit',
+    title: t("Confirm action"),
+    message: t("Perform the example action?"),
+    confirmLabel: t("Yes, proceed"),
+    cancelLabel: t("Cancel"),
   })
-  dialogResult.value = accepted ? 'Akce byla potvrzena.' : 'Akce byla zrušena.'
+  dialogResult.value = accepted ? t("Action confirmed.") : t("Action cancelled.")
 }
 
 function showSettings(): void {
@@ -402,25 +404,25 @@ function showSettings(): void {
   const form = document.createElement('div')
   form.className = 'dialog-demo-form'
   const label = document.createElement('label')
-  label.textContent = 'Název umístění'
+  label.textContent = t("Location name")
   const input = document.createElement('input')
   input.type = 'text'
-  input.value = 'Domov'
+  input.value = t("Home")
   input.maxLength = 80
   label.append(input)
   const hint = document.createElement('p')
-  hint.textContent = 'Formulářový obsah zůstává uvnitř scrollovatelné části dialogu.'
+  hint.textContent = t("Form content stays inside the scrollable area of the dialog.")
   form.append(label, hint)
   core.dialogs.open({
-    title: 'Ukázkové nastavení',
+    title: t("Example settings"),
     content: form,
     actions: [
-      { label: 'Zrušit' },
+      { label: t("Cancel") },
       {
-        label: 'Uložit',
+        label: t("Save"),
         variant: 'primary',
         onClick: () => {
-          dialogResult.value = 'Uložena hodnota: ' + input.value
+          dialogResult.value = t("Saved value: ") + input.value
         },
       },
     ],
@@ -435,17 +437,17 @@ function showLongDialog(): void {
   for (let index = 1; index <= 12; index += 1) {
     const section = document.createElement('section')
     const heading = document.createElement('h3')
-    heading.textContent = 'Sekce ' + index
+    heading.textContent = t("Section ") + index
     const paragraph = document.createElement('p')
-    paragraph.textContent = 'Dlouhý obsah se posouvá uvnitř dialogu, zatímco nadpis a ovládací tlačítka zůstávají dostupné.'
+    paragraph.textContent = t("Long content scrolls inside the dialog while its heading and buttons remain accessible.")
     section.append(heading, paragraph)
     content.append(section)
   }
   core.dialogs.open({
-    title: 'Dlouhý scrollovatelný obsah',
+    title: t("Long scrollable content"),
     content,
     size: 'large',
-    actions: [{ label: 'Zavřít', variant: 'primary' }],
+    actions: [{ label: t("Close"), variant: 'primary' }],
   })
 }
 
@@ -453,33 +455,33 @@ function showNotification(type: 'success' | 'info' | 'warning' | 'error'): void 
   const manager = window.HcSharedAppCore?.notifications
   if (!manager) return
   const messages = {
-    success: 'Změny byly úspěšně uloženy.',
-    info: 'Probíhá aktualizace zobrazených dat.',
-    warning: 'Některé hodnoty vyžadují kontrolu.',
-    error: 'Spojení se službou se nezdařilo.',
+    success: t("Changes saved successfully."),
+    info: t("Updating displayed data."),
+    warning: t("Some values need review."),
+    error: t("Connection to the service failed."),
   }
   manager.show({
     type,
-    title: type === 'error' ? 'Chyba spojení' : undefined,
+    title: type === 'error' ? t("Connection error") : undefined,
     message: messages[type],
     persistent: type === 'error',
   })
 }
 
 function showDuplicate(): void {
-  window.HcSharedAppCore?.notifications.success('Nastavení uloženo.', {
+  window.HcSharedAppCore?.notifications.success(t("Settings saved."), {
     dedupeKey: 'playground-save',
     cooldownMs: 2500,
   })
 }
 
 function showNotificationAction(): void {
-  window.HcSharedAppCore?.notifications.info('Je dostupná nová ukázková akce.', {
+  window.HcSharedAppCore?.notifications.info(t("A new example action is available."), {
     persistent: true,
     action: {
-      label: 'Provést',
+      label: t("Proceed"),
       onClick: () => {
-        dialogResult.value = 'Akce z oznámení byla provedena.'
+        dialogResult.value = t("Notification action performed.")
       },
     },
   })
@@ -491,15 +493,15 @@ function mountToolbar(): void {
   if (!oCore || !oElement) return
   toolbarController?.destroy()
   const fnSelect = (sAction: string): void => {
-    toolbarResult.value = 'Vybraná akce: ' + sAction
+    toolbarResult.value = t("Selected action: ") + sAction
   }
   toolbarController = oCore.toolbar.create(oElement, {
-    ariaLabel: 'Ukázkové nástroje',
+    ariaLabel: t("Example tools"),
     actions: [
-      { id: 'add', label: 'Přidat', icon: '+', variant: 'primary', onClick: () => fnSelect('Přidat') },
-      { id: 'filter', label: 'Filtrovat', icon: '⌕', compact: true, onClick: () => fnSelect('Filtrovat') },
-      { id: 'settings', label: 'Nastavení', icon: '⚙', compact: true, onClick: () => fnSelect('Nastavení') },
-      { id: 'delete', label: 'Odstranit', icon: '×', variant: 'danger', compact: true, onClick: () => fnSelect('Odstranit') },
+      { id: 'add', label: t("Add"), icon: '+', variant: 'primary', onClick: () => fnSelect(t("Add")) },
+      { id: 'filter', label: t("Filter"), icon: '⌕', compact: true, onClick: () => fnSelect(t("Filter")) },
+      { id: 'settings', label: t("Settings"), icon: '⚙', compact: true, onClick: () => fnSelect(t("Settings")) },
+      { id: 'delete', label: t("Delete"), icon: '×', variant: 'danger', compact: true, onClick: () => fnSelect(t("Delete")) },
     ],
   })
 }
@@ -510,10 +512,10 @@ function mountSettingsForm(): void {
   if (!oHost || !oCore) return
   formController?.destroy()
   formController = oCore.forms.create([
-    { id: 'location', label: 'Výchozí místo', type: 'text', value: 'Praha', required: true, maxLength: 80 },
-    { id: 'items', label: 'Počet položek', type: 'number', value: 6, min: 1, max: 24 },
-    { id: 'units', label: 'Jednotky', type: 'select', value: 'metric', options: [{ value: 'metric', label: 'Metrické' }, { value: 'imperial', label: 'Imperiální' }] },
-    { id: 'notifications', label: 'Povolit upozornění', type: 'checkbox', value: true, hint: 'Ukázka přepínače společného formuláře.' },
+    { id: 'location', label: t("Default location"), type: 'text', value: t("Prague"), required: true, maxLength: 80 },
+    { id: 'items', label: t("Number of items"), type: 'number', value: 6, min: 1, max: 24 },
+    { id: 'units', label: t("Units"), type: 'select', value: 'metric', options: [{ value: 'metric', label: t("Metric") }, { value: 'imperial', label: t("Imperial") }] },
+    { id: 'notifications', label: t("Enable notifications"), type: 'checkbox', value: true, hint: t("Example shared form toggle.") },
   ])
   oHost.replaceChildren(formController.element)
 }
@@ -524,11 +526,11 @@ async function saveSettings(): Promise<void> {
   try {
     const oClient = oCore.settings.create(props.coreSettingsUrl, 'hc_shared_app_core_playground')
     await oClient.save(formController.values())
-    settingsResult.value = 'Nastavení bylo trvale uloženo pro aktuálního uživatele.'
-    oCore.notifications.success('Nastavení uloženo.', { dedupeKey: 'playground-settings' })
+    settingsResult.value = t("Settings saved permanently for the current user.")
+    oCore.notifications.success(t("Settings saved."), { dedupeKey: 'playground-settings' })
   } catch (oError) {
     settingsResult.value = oError instanceof Error ? oError.message : String(oError)
-    oCore.notifications.error('Nastavení se nepodařilo uložit.')
+    oCore.notifications.error(t("Failed to save settings."))
   }
 }
 
@@ -540,11 +542,11 @@ function mountPicker(): void {
   pickerController = oCore.picker.create(oHost, {
     endpoint: props.coreShareesUrl,
     multiple: true,
-    placeholder: 'Začni psát jméno uživatele nebo skupiny…',
+    placeholder: t("Start typing a user or group name…"),
     onChange: (aItems) => {
       pickerResult.value = aItems.length
-        ? 'Vybráno: ' + aItems.map((oItem) => oItem.label).join(', ')
-        : 'Není vybrán žádný uživatel ani skupina.'
+        ? t("Selected: ") + aItems.map((oItem) => oItem.label).join(', ')
+        : t("No user or group selected.")
     },
   })
 }
@@ -593,8 +595,8 @@ onMounted(async () => {
   mountAboutInfo()
   mountMapDemo()
   if (editorHost.value) editorController = window.HcSharedAppCore?.editor.create(editorHost.value, {
-    value: editorSample,
-    label: 'Text ukázkového dokumentu',
+    value: editorSample(),
+    label: t("Example document text"),
     embedImages: true,
     showPreview: true,
     splitView: true,
@@ -605,7 +607,7 @@ onMounted(async () => {
     try {
       const saved = await backgroundController?.load()
       if (saved?.mode === 'none' || saved?.mode === 'solid' || saved?.mode === 'gradient') backgroundMode.value = saved.mode
-      backgroundStatus.value = 'Pozadí načteno.'
+      backgroundStatus.value = t("Background loaded.")
     } catch (error) { backgroundStatus.value = error instanceof Error ? error.message : String(error) }
   }
   await loadLists()
@@ -632,7 +634,7 @@ onBeforeUnmount(() => {
       <div>
         <p class="eyebrow">Shared App Core</p>
         <h1>Shared App Core Playground</h1>
-        <p>Vývojová laboratoř společných komponent a služeb.</p>
+        <p>{{ t("Development lab for shared components and services.") }}</p>
       </div>
       <div class="version-badge">Playground {{ playgroundVersion }}</div>
     </header>
@@ -640,16 +642,16 @@ onBeforeUnmount(() => {
     <section class="summary" :class="{ success: allPassed }">
       <div class="summary-icon">{{ allPassed ? '✓' : running ? '…' : '!' }}</div>
       <div>
-        <h2>{{ allPassed ? 'Kontroly API prošly' : running ? 'Probíhá kontrola' : 'Kontrola vyžaduje pozornost' }}</h2>
-        <p>{{ passedCount }} z {{ tests.length }} testů úspěšných</p>
+        <h2>{{ allPassed ? t("API checks passed") : running ? t("Checking") : t("Checks need attention") }}</h2>
+        <p>{{ passedCount }} {{ t("of") }} {{ tests.length }} {{ t("successful tests") }}</p>
       </div>
       <button type="button" :disabled="running" @click="runTests">
-        {{ running ? 'Testuji…' : 'Spustit znovu' }}
+        {{ running ? t("Testing…") : t("Run again") }}
       </button>
     </section>
 
-      <p role="status">Základní kontroly API jsou oddělené od provozních zkoušek níže. Skutečnou mapu, GPS a ukládání spustíte tlačítkem.</p>
-    <section class="test-grid" aria-label="Výsledky testů Core">
+      <p role="status">{{ t("Basic API checks are separate from the runtime tests below. Start the real map, GPS and storage tests with the buttons.") }}</p>
+    <section class="test-grid" :aria-label="t('Core test results')">
       <article v-for="test in tests" :key="test.id" class="test-card" :class="test.state">
         <div class="state-icon">
           <span v-if="test.state === 'passed'">✓</span>
@@ -665,23 +667,23 @@ onBeforeUnmount(() => {
     </section>
 
     <section class="details">
-      <h2>Aktivní kontrakt</h2>
+      <h2>{{ t("Active contract") }}</h2>
       <dl>
-        <div><dt>Požadované Core</dt><dd>≥ {{ requiredCoreVersion }}</dd></div>
-        <div><dt>Načtené Core</dt><dd>{{ loadedCoreVersion }}</dd></div>
+        <div><dt>{{ t("Required Core") }}</dt><dd>≥ {{ requiredCoreVersion }}</dd></div>
+        <div><dt>{{ t("Loaded Core") }}</dt><dd>{{ loadedCoreVersion }}</dd></div>
         <div><dt>Backend API</dt><dd>{{ serverStatus?.apiVersion ?? '—' }}</dd></div>
-        <div><dt>Nextcloud rozsah</dt><dd>{{ serverStatus?.nextcloud ? serverStatus.nextcloud.min + '–' + serverStatus.nextcloud.max : '—' }}</dd></div>
+        <div><dt>{{ t("Nextcloud range") }}</dt><dd>{{ serverStatus?.nextcloud ? serverStatus.nextcloud.min + '–' + serverStatus.nextcloud.max : '—' }}</dd></div>
       </dl>
     </section>
 
     <section class="workspace-demo">
       <div class="demo-heading">
         <div>
-          <p class="eyebrow">První společná komponenta</p>
+          <p class="eyebrow">{{ t("First shared component") }}</p>
           <h2>Responsive Workspace</h2>
-          <p>Režim se určuje podle šířky kontejneru, ne pouze podle celého okna.</p>
+          <p>{{ t("The mode depends on the container width rather than the entire window.") }}</p>
         </div>
-        <div class="size-switcher" aria-label="Šířka ukázky">
+        <div class="size-switcher" :aria-label="t('Example width')">
           <button
             v-for="size in (['auto', 'desktop', 'tablet', 'mobile'] as const)"
             :key="size"
@@ -689,7 +691,7 @@ onBeforeUnmount(() => {
             :class="{ active: previewSize === size }"
             @click="setPreviewSize(size)"
           >
-            {{ size === 'auto' ? 'Automaticky' : size }}
+            {{ size === 'auto' ? t("Automatic") : size }}
           </button>
         </div>
       </div>
@@ -701,26 +703,26 @@ onBeforeUnmount(() => {
           :class="'preview-' + previewSize"
         >
           <header class="hc-shared-app-core-workspace__header">
-            <div><strong>Ukázková aplikace</strong><small>Společné adaptivní rozložení</small></div>
-            <span class="mode-chip">{{ workspaceMetrics?.mode ?? 'čekám' }}</span>
+            <div><strong>{{ t("Example app") }}</strong><small>{{ t("Shared adaptive layout") }}</small></div>
+            <span class="mode-chip">{{ workspaceMetrics?.mode ?? t("waiting") }}</span>
           </header>
           <nav class="hc-shared-app-core-workspace__toolbar">
-            <button type="button">Přidat</button>
-            <button type="button">Filtrovat</button>
-            <button type="button">Nastavení</button>
+            <button type="button">{{ t("Add") }}</button>
+            <button type="button">{{ t("Filter") }}</button>
+            <button type="button">{{ t("Settings") }}</button>
           </nav>
           <div class="hc-shared-app-core-workspace__body">
             <aside class="hc-shared-app-core-workspace__sidebar">
-              <strong>Navigace</strong>
-              <a href="#" @click.prevent>První položka</a>
-              <a href="#" @click.prevent>Druhá položka</a>
-              <a href="#" @click.prevent>Třetí položka</a>
+              <strong>{{ t("Navigation") }}</strong>
+              <a href="#" @click.prevent>{{ t("First item") }}</a>
+              <a href="#" @click.prevent>{{ t("Second item") }}</a>
+              <a href="#" @click.prevent>{{ t("Third item") }}</a>
             </aside>
             <div class="hc-shared-app-core-workspace__content">
               <div class="hc-shared-app-core-responsive-grid">
                 <article v-for="item in 4" :key="item">
-                  <strong>Karta {{ item }}</strong>
-                  <p>Obsah se přizpůsobuje dostupnému prostoru.</p>
+                  <strong>{{ t("Card") }} {{ item }}</strong>
+                  <p>{{ t("Content adapts to the available space.") }}</p>
                 </article>
               </div>
             </div>
@@ -729,23 +731,22 @@ onBeforeUnmount(() => {
       </div>
       <p class="metrics">
         {{ workspaceMetrics?.width ?? '—' }} × {{ workspaceMetrics?.height ?? '—' }} px ·
-        viewport {{ workspaceMetrics?.viewportHeight ?? '—' }} px ·
-        režim <strong>{{ workspaceMetrics?.mode ?? '—' }}</strong>
+        viewport {{ workspaceMetrics?.viewportHeight ?? '—' }} {{ t("px · mode") }} <strong>{{ workspaceMetrics?.mode ?? '—' }}</strong>
       </p>
     </section>
 
     <section class="dialog-demo">
       <div class="demo-heading">
         <div>
-          <p class="eyebrow">Druhá společná komponenta</p>
+          <p class="eyebrow">{{ t("Second shared component") }}</p>
           <h2>Dialog Engine</h2>
-          <p>Jednotné dialogy s podporou klávesnice, fokusu, dlouhého obsahu a mobilu.</p>
+          <p>{{ t("Consistent dialogs supporting keyboard navigation, focus, long content and mobile devices.") }}</p>
         </div>
       </div>
       <div class="dialog-demo-actions">
-        <button type="button" @click="showConfirmation">Otevřít potvrzení</button>
-        <button type="button" @click="showSettings">Otevřít nastavení</button>
-        <button type="button" @click="showLongDialog">Otevřít dlouhý obsah</button>
+        <button type="button" @click="showConfirmation">{{ t("Open confirmation") }}</button>
+        <button type="button" @click="showSettings">{{ t("Open settings") }}</button>
+        <button type="button" @click="showLongDialog">{{ t("Open long content") }}</button>
       </div>
       <p class="dialog-result" aria-live="polite">{{ dialogResult }}</p>
     </section>
@@ -753,31 +754,28 @@ onBeforeUnmount(() => {
     <section class="notification-demo">
       <div class="demo-heading">
         <div>
-          <p class="eyebrow">Třetí společná komponenta</p>
+          <p class="eyebrow">{{ t("Third shared component") }}</p>
           <h2>Notification Manager</h2>
-          <p>Lehká oznámení aplikace bez zbytečného zaplňování Nextcloud zvonečku.</p>
+          <p>{{ t("Lightweight app notifications without filling the Nextcloud notification bell.") }}</p>
         </div>
       </div>
       <div class="notification-demo-actions">
-        <button type="button" @click="showNotification('success')">Success</button>
-        <button type="button" @click="showNotification('info')">Info</button>
-        <button type="button" @click="showNotification('warning')">Warning</button>
-        <button type="button" @click="showNotification('error')">Trvalá chyba</button>
-        <button type="button" @click="showDuplicate">Opakované uložení</button>
-        <button type="button" @click="showNotificationAction">Oznámení s akcí</button>
+        <button type="button" @click="showNotification('success')">{{ t("Success") }}</button>
+        <button type="button" @click="showNotification('info')">{{ t("Info") }}</button>
+        <button type="button" @click="showNotification('warning')">{{ t("Warning") }}</button>
+        <button type="button" @click="showNotification('error')">{{ t("Persistent error") }}</button>
+        <button type="button" @click="showDuplicate">{{ t("Repeated save") }}</button>
+        <button type="button" @click="showNotificationAction">{{ t("Notification with action") }}</button>
       </div>
-      <p class="notification-note">
-        Klikni několikrát na „Opakované uložení“ — místo záplavy zpráv se aktivní
-        oznámení sloučí a ukáže počet opakování.
-      </p>
+      <p class="notification-note"> {{ t("Click Repeated save several times. Active notifications merge and display the repetition count.") }} </p>
     </section>
 
     <section class="toolbar-demo">
       <div class="demo-heading">
         <div>
-          <p class="eyebrow">Čtvrtá společná komponenta</p>
+          <p class="eyebrow">{{ t("Fourth shared component") }}</p>
           <h2>Toolbar</h2>
-          <p>Jednotné akce, přístupnost, blokování během operace a kompaktní mobilní zobrazení.</p>
+          <p>{{ t("Consistent actions, accessibility, operation locking and compact mobile controls.") }}</p>
         </div>
       </div>
       <nav ref="toolbarDemo" class="toolbar-demo-host"></nav>
@@ -787,14 +785,14 @@ onBeforeUnmount(() => {
     <section class="settings-demo">
       <div class="demo-heading">
         <div>
-          <p class="eyebrow">Pátý společný milník</p>
+          <p class="eyebrow">{{ t("Fifth shared milestone") }}</p>
           <h2>Form Engine + Settings Service</h2>
-          <p>Jednotná pole, validace a nastavení uložené pro přihlášeného uživatele.</p>
+          <p>{{ t("Consistent fields, validation and settings saved for the signed-in user.") }}</p>
         </div>
       </div>
       <div ref="settingsFormHost"></div>
       <div class="settings-demo-actions">
-        <button type="button" @click="saveSettings">Uložit nastavení</button>
+        <button type="button" @click="saveSettings">{{ t("Save settings") }}</button>
         <span aria-live="polite">{{ settingsResult }}</span>
       </div>
     </section>
@@ -802,9 +800,9 @@ onBeforeUnmount(() => {
     <section class="picker-demo">
       <div class="demo-heading">
         <div>
-          <p class="eyebrow">Šestá společná komponenta</p>
+          <p class="eyebrow">{{ t("Sixth shared component") }}</p>
           <h2>User/Group Picker</h2>
-          <p>Vyhledání skutečných účtů a skupin Nextcloudu s vícenásobným výběrem.</p>
+          <p>{{ t("Search for real Nextcloud users and groups with multiple selection.") }}</p>
         </div>
       </div>
       <div ref="pickerHost"></div>
@@ -814,103 +812,101 @@ onBeforeUnmount(() => {
     <section class="layout-demo">
       <div class="demo-heading">
         <div>
-          <p class="eyebrow">Sedmá společná komponenta</p>
+          <p class="eyebrow">{{ t("Seventh shared component") }}</p>
           <h2>Layout Primitives</h2>
-          <p>Jednotná výška, pevná hlavička a toolbar, scrollovatelný obsah a plocha pro mapu nebo graf.</p>
+          <p>{{ t("Consistent height, fixed header and toolbar, scrollable content and a map or chart surface.") }}</p>
         </div>
       </div>
       <div ref="layoutPreview" class="layout-preview hc-shared-app-core-layout">
         <header class="hc-shared-app-core-layout__header">
-          <strong>Weather pohled</strong>
-          <span class="mode-chip">{{ layoutMetrics?.mode ?? 'čekám' }}</span>
+          <strong>{{ t("Weather view") }}</strong>
+          <span class="mode-chip">{{ layoutMetrics?.mode ?? t("waiting") }}</span>
         </header>
-        <nav class="hc-shared-app-core-layout__toolbar" aria-label="Ukázkové pohledy">
-          <button type="button">Přehled</button>
+        <nav class="hc-shared-app-core-layout__toolbar" :aria-label="t('Example views')">
+          <button type="button">{{ t("Overview") }}</button>
           <button type="button">Radar</button>
-          <button type="button">Vítr</button>
-          <button type="button">Bouřky</button>
+          <button type="button">{{ t("Wind") }}</button>
+          <button type="button">{{ t("Storms") }}</button>
         </nav>
         <div class="hc-shared-app-core-layout__content">
           <section class="hc-shared-app-core-view">
             <div class="hc-shared-app-core-split-view hc-shared-app-core-split-view--horizontal">
               <aside class="hc-shared-app-core-split-view__primary hc-shared-app-core-scroll-area">
-                <strong>Ovládání pohledu</strong>
-                <p>Posouvá se pouze obsah panelu.</p>
+                <strong>{{ t("View controls") }}</strong>
+                <p>{{ t("Only the panel content scrolls.") }}</p>
               </aside>
               <div class="hc-shared-app-core-split-view__secondary hc-shared-app-core-surface">
-                <strong>Mapa / graf</strong>
-                <small>Vyplňuje všechen zbývající prostor.</small>
+                <strong>{{ t("Map / chart") }}</strong>
+                <small>{{ t("Fills all remaining space.") }}</small>
               </div>
             </div>
           </section>
         </div>
       </div>
       <p class="metrics">
-        {{ layoutMetrics?.width ?? '—' }} × {{ layoutMetrics?.height ?? '—' }} px ·
-        režim <strong>{{ layoutMetrics?.mode ?? '—' }}</strong> · resize událost připravena
-      </p>
+        {{ layoutMetrics?.width ?? '—' }} × {{ layoutMetrics?.height ?? '—' }} {{ t("px · mode") }} <strong>{{ layoutMetrics?.mode ?? '—' }}</strong> {{ t("· resize event ready") }} </p>
     </section>
 
     <section class="about-demo">
       <div class="demo-heading">
         <div>
-          <p class="eyebrow">Osmá společná komponenta</p>
+          <p class="eyebrow">{{ t("Eighth shared component") }}</p>
           <h2>About & Update Service</h2>
-          <p>Jednotné informace o aplikaci, Core a dostupných verzích na GitHubu.</p>
+          <p>{{ t("Consistent information about the app, Core and available GitHub versions.") }}</p>
         </div>
       </div>
       <div ref="aboutHost"></div>
     </section>
 
     <section class="settings-demo">
-      <h2>Společný editor</h2>
-      <p>Vyzkoušej kurzívu, podtržení, barvy, písma, knihovnu emoji a hledání volných obrázků. Náhled je vedle textu na PC a pod ním na mobilu. Obsah této ukázky se neukládá; obrázek do 1 MiB je vložen jen do dočasného dokumentu.</p>
+      <h2>{{ t("Shared editor") }}</h2>
+      <p>{{ t("Try formatting, fonts, emoji and free image search. Preview is beside the text on desktop and below it on mobile. The sample is not saved; images up to 1 MiB are embedded only in the temporary document.") }}</p>
       <div ref="editorHost"></div>
     </section>
 
     <section class="settings-demo">
-      <h2>Společné pozadí</h2>
-      <p>Volba pozadí se ukládá zvlášť pro aktuálního uživatele.</p>
-      <label>Režim <select v-model="backgroundMode"><option value="none">Bez pozadí</option><option value="solid">Barva</option><option value="gradient">Přechod</option></select></label>
-      <button type="button" @click="saveBackground">Uložit pozadí</button>
+      <h2>{{ t("Shared background") }}</h2>
+      <p>{{ t("Background choice is saved separately for the current user.") }}</p>
+      <label>{{ t("Mode") }} <select v-model="backgroundMode"><option value="none">{{ t("No background") }}</option><option value="solid">{{ t("Color") }}</option><option value="gradient">{{ t("Gradient") }}</option></select></label>
+      <button type="button" @click="saveBackground">{{ t("Save background") }}</button>
       <p role="status">{{ backgroundStatus }}</p>
-      <div ref="backgroundHost" class="background-demo-preview">Ukázková plocha aplikace</div>
+      <div ref="backgroundHost" class="background-demo-preview">{{ t("Example app surface") }}</div>
     </section>
 
     <section class="settings-demo">
-      <h2>Sdílené seznamy a místa</h2>
-      <p>Ukázka skutečné služby Core. Právo read/edit a skupinové sdílení kontroluje server.</p>
+      <h2>{{ t("Shared lists and places") }}</h2>
+      <p>{{ t("Real Core service demo. The server checks read/edit permissions and group sharing.") }}</p>
       <p role="status">{{ listsStatus }}</p>
-      <button type="button" @click="createDemoList">Vytvořit seznam</button>
-      <button type="button" :disabled="!activeListId || sharedLists.find(item => item.id === activeListId)?.permission !== 'owner'" @click="createDemoChild">Vytvořit podseznam</button>
-      <label>Seznam <select v-model="activeListId" @change="loadLists"><option v-for="item in sharedLists" :key="item.id" :value="item.id">{{ item.parent_id ? '↳ ' : '' }}{{ item.title }} ({{ item.permission }})</option></select></label>
-      <button type="button" :disabled="!activeListId || sharedLists.find(item => item.id === activeListId)?.permission === 'read'" @click="addDemoPlace">Přidat Prahu</button>
-      <button type="button" :disabled="sharedLists.find(item => item.id === activeListId)?.permission !== 'owner'" @click="grantSelected('read')">Sdílet výběru pro čtení</button>
-      <button type="button" :disabled="sharedLists.find(item => item.id === activeListId)?.permission !== 'owner'" @click="grantSelected('edit')">Sdílet výběru pro úpravy</button>
-      <button type="button" :disabled="!sharedPlaces.length || sharedLists.find(item => item.id === activeListId)?.permission !== 'owner'" @click="shareDemoPlace('read')">Sdílet pouze první místo</button>
-      <button type="button" :disabled="!activeListId || sharedLists.find(item => item.id === activeListId)?.permission === 'read'" @click="toggleArchive">Archivovat / obnovit</button>
+      <button type="button" @click="createDemoList">{{ t("Create list") }}</button>
+      <button type="button" :disabled="!activeListId || sharedLists.find(item => item.id === activeListId)?.permission !== 'owner'" @click="createDemoChild">{{ t("Create sublist") }}</button>
+      <label>{{ t("List") }} <select v-model="activeListId" @change="loadLists"><option v-for="item in sharedLists" :key="item.id" :value="item.id">{{ item.parent_id ? '↳ ' : '' }}{{ item.title }} ({{ item.permission }})</option></select></label>
+      <button type="button" :disabled="!activeListId || sharedLists.find(item => item.id === activeListId)?.permission === 'read'" @click="addDemoPlace">{{ t("Add Prague") }}</button>
+      <button type="button" :disabled="sharedLists.find(item => item.id === activeListId)?.permission !== 'owner'" @click="grantSelected('read')">{{ t("Share with selected users for reading") }}</button>
+      <button type="button" :disabled="sharedLists.find(item => item.id === activeListId)?.permission !== 'owner'" @click="grantSelected('edit')">{{ t("Share with selected users for editing") }}</button>
+      <button type="button" :disabled="!sharedPlaces.length || sharedLists.find(item => item.id === activeListId)?.permission !== 'owner'" @click="shareDemoPlace('read')">{{ t("Share only the first place") }}</button>
+      <button type="button" :disabled="!activeListId || sharedLists.find(item => item.id === activeListId)?.permission === 'read'" @click="toggleArchive">{{ t("Archive / restore") }}</button>
       <ul><li v-for="place in sharedPlaces" :key="place.id">{{ place.name }} · {{ place.lat }}, {{ place.lon }}</li></ul>
     </section>
 
     <section class="maps-demo">
-      <div class="demo-heading"><div><p class="eyebrow">Desátá společná komponenta</p><h2>Core Maps Proxy & Cache</h2><p>Jednotný viewport, vrstvy, serverová tile proxy, sdílená cache a registry providerů.</p></div><button type="button" @click="openMapCacheSettings">Nastavení cache a statistiky</button></div>
-      <div ref="mapHost" class="maps-demo-host"><div class="maps-demo-grid">Mapová plocha aplikace</div></div>
+      <div class="demo-heading"><div><p class="eyebrow">{{ t("Tenth shared component") }}</p><h2>Core Maps Proxy & Cache</h2><p>{{ t("Shared viewport, layers, server tile proxy, shared cache and provider registry.") }}</p></div><button type="button" @click="openMapCacheSettings">{{ t("Cache settings and statistics") }}</button></div>
+      <div ref="mapHost" class="maps-demo-host"><div class="maps-demo-grid">{{ t("App map surface") }}</div></div>
       <p class="metrics">{{ mapViewport }}</p>
       <div class="map-diagnostics">
-        <article><small>Provideři</small><strong>{{ mapProviders.map((oProvider) => oProvider.id + (oProvider.configured ? ' ✓' : ' – bez klíče')).join(', ') || 'načítám' }}</strong></article>
-        <article><small>Odmítnuto limitem</small><strong>{{ mapDiagnostics?.rateLimitedRequests ?? '—' }}</strong></article>
-        <article><small>Chyby počítadla / poskytovatele</small><strong>{{ mapDiagnostics ? (mapDiagnostics.limiterUnavailableRequests ?? '—') + ' / ' + (mapDiagnostics.providerErrors ?? '—') : '—' }}</strong></article>
-        <article><small>Požadavky dnes</small><strong>{{ mapDiagnostics?.requests ?? '—' }}</strong></article>
+        <article><small>{{ t("Providers") }}</small><strong>{{ mapProviders.map((oProvider) => oProvider.id + (oProvider.configured ? ' ✓' : t(" – no key"))).join(', ') || t("loading") }}</strong></article>
+        <article><small>{{ t("Rate limited") }}</small><strong>{{ mapDiagnostics?.rateLimitedRequests ?? '—' }}</strong></article>
+        <article><small>{{ t("Counter / provider errors") }}</small><strong>{{ mapDiagnostics ? (mapDiagnostics.limiterUnavailableRequests ?? '—') + ' / ' + (mapDiagnostics.providerErrors ?? '—') : '—' }}</strong></article>
+        <article><small>{{ t("Requests today") }}</small><strong>{{ mapDiagnostics?.requests ?? '—' }}</strong></article>
         <article><small>Cache hit / miss</small><strong>{{ mapDiagnostics ? mapDiagnostics.cacheHits + ' / ' + mapDiagnostics.cacheMisses : '—' }}</strong></article>
-        <article><small>Externí / ušetřené</small><strong>{{ mapDiagnostics ? mapDiagnostics.externalRequests + ' / ' + mapDiagnostics.savedExternalRequests : '—' }}</strong></article>
-        <article><small>Velikost cache</small><strong>{{ mapDiagnostics ? (mapDiagnostics.cacheBytes / 1048576).toFixed(1) + ' MiB / ' + (mapDiagnostics.cacheLimitBytes / 1073741824).toFixed(1) + ' GiB' : '—' }}</strong></article>
-        <article><small>Zaplnění</small><strong>{{ mapDiagnostics ? mapDiagnostics.cacheUsagePercent.toFixed(2) + ' %' : '—' }}</strong></article>
-        <article><small>Počet dlaždic</small><strong>{{ mapDiagnostics?.cacheEntryCount ?? '—' }}</strong></article>
-        <article><small>Nejstarší položka</small><strong>{{ mapDiagnostics?.cacheOldestStoredAt ? new Date(mapDiagnostics.cacheOldestStoredAt).toLocaleString() : '—' }}</strong></article>
-        <article><small>TTL server / prohlížeč</small><strong>{{ mapDiagnostics ? Math.round(mapDiagnostics.tileCacheTtlSeconds / 86400) + ' / ' + Math.round(mapDiagnostics.browserCacheTtlSeconds / 86400) + ' dní' : '—' }}</strong></article>
+        <article><small>{{ t("External / saved") }}</small><strong>{{ mapDiagnostics ? mapDiagnostics.externalRequests + ' / ' + mapDiagnostics.savedExternalRequests : '—' }}</strong></article>
+        <article><small>{{ t("Cache size") }}</small><strong>{{ mapDiagnostics ? (mapDiagnostics.cacheBytes / 1048576).toFixed(1) + ' MiB / ' + (mapDiagnostics.cacheLimitBytes / 1073741824).toFixed(1) + ' GiB' : '—' }}</strong></article>
+        <article><small>{{ t("Usage") }}</small><strong>{{ mapDiagnostics ? mapDiagnostics.cacheUsagePercent.toFixed(2) + ' %' : '—' }}</strong></article>
+        <article><small>{{ t("Tile count") }}</small><strong>{{ mapDiagnostics?.cacheEntryCount ?? '—' }}</strong></article>
+        <article><small>{{ t("Oldest entry") }}</small><strong>{{ mapDiagnostics?.cacheOldestStoredAt ? new Date(mapDiagnostics.cacheOldestStoredAt).toLocaleString() : '—' }}</strong></article>
+        <article><small>{{ t("TTL server / browser") }}</small><strong>{{ mapDiagnostics ? Math.round(mapDiagnostics.tileCacheTtlSeconds / 86400) + ' / ' + Math.round(mapDiagnostics.browserCacheTtlSeconds / 86400) + t(" days") : '—' }}</strong></article>
       </div>
-      <p v-if="mapDiagnosticsError" class="map-provider-error">Diagnostiku nelze načíst: {{ mapDiagnosticsError }}</p>
-      <p v-if="mapDiagnostics?.lastProviderError" class="map-provider-error">Poslední chyba: {{ mapDiagnostics.lastProviderError }}</p>
+      <p v-if="mapDiagnosticsError" class="map-provider-error">{{ t("Cannot load diagnostics:") }} {{ mapDiagnosticsError }}</p>
+      <p v-if="mapDiagnostics?.lastProviderError" class="map-provider-error">{{ t("Last error:") }} {{ mapDiagnostics.lastProviderError }}</p>
     </section>
   <ConcurrencyDemo />
   <RuntimeChecks :settings-url="coreSettingsUrl" />

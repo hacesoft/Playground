@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t } from './i18n'
+
 import { ref, nextTick, onBeforeUnmount } from 'vue'
 import * as L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -14,13 +16,13 @@ interface LiveMaps {
  followLocation(map:MapController,tracker:Tracker,options:{keepZoom:boolean}):Follow
 }
 const host=ref<HTMLElement>(), canvas=ref<HTMLElement>(), running=ref(false), busy=ref(false), gps=ref(false), following=ref(false)
-const message=ref('Mapa se načte až tlačítkem.'), probe=ref('Dosud netestováno.'), writing=ref(false), writeResult=ref('Dosud netestováno.')
+const message=ref(t("The map loads only when you press the button.")), probe=ref(t("Not tested yet.")), writing=ref(false), writeResult=ref(t("Not tested yet."))
 const providers=ref<Array<{id:string;name:string;mapsets:string[];attribution?:string}>>([]), provider=ref(''), mapset=ref('')
 let map:L.Map|undefined, controller:LiveController|undefined, loader:ReturnType<LiveMaps['createTileLoader']>|undefined, layer:L.GridLayer|undefined
 let tracker:Tracker|undefined, follow:Follow|undefined, marker:L.CircleMarker|undefined, resize:LayoutController|undefined
 let disposed=false, abort=new AbortController(), tileCancels=new Map<HTMLElement,AbortController>()
 const pendingFavorite=ref('')
-const core=()=>{const value=window.HcSharedAppCore;if(!value)throw Error('Core není načtené.');return value}
+const core=()=>{const value=window.HcSharedAppCore;if(!value)throw Error(t("Core is not loaded."));return value}
 const maps=()=>core().maps as NonNullable<Window['HcSharedAppCore']>['maps'] & LiveMaps
 const errorText=(e:unknown)=>e instanceof Error?e.message:String(e)
 function stopGps(){follow?.destroy();tracker?.destroy();follow=undefined;tracker=undefined;gps.value=false;following.value=false;marker?.remove();marker=undefined}
@@ -35,7 +37,7 @@ function changeLayer(){
   const cancel=new AbortController();tileCancels.set(tile,cancel)
   tileLoader.load(core().maps.tileUrl(p,m,256,coords.z,coords.x,coords.y),{signal:cancel.signal})
    .then(blob=>createImageBitmap(blob)).then(bitmap=>{try{if(!cancel.signal.aborted){tile.getContext('2d')!.drawImage(bitmap,0,0,256,256);done(undefined,tile)}}finally{bitmap.close()}})
-   .catch(e=>{if(!cancel.signal.aborted){message.value='Dlaždice: '+errorText(e);done(e,tile)}})
+   .catch(e=>{if(!cancel.signal.aborted){message.value=t("Tile: ")+errorText(e);done(e,tile)}})
   return tile
  }})
  // Provider text is inserted as text, never as HTML in Leaflet attribution.
@@ -46,7 +48,7 @@ function changeLayer(){
 function providerChanged(){mapset.value=providers.value.find(p=>p.id===provider.value)?.mapsets[0]??'';changeLayer()}
 async function start(){busy.value=true;try{
  const list=await core().maps.providers.list();if(disposed)return
- providers.value=list.filter(p=>p.enabled&&p.configured);if(!providers.value.length)throw Error('Žádný dostupný provider.')
+ providers.value=list.filter(p=>p.enabled&&p.configured);if(!providers.value.length)throw Error(t("No available provider."))
  provider.value=providers.value[0]!.id;mapset.value=providers.value[0]!.mapsets[0]??'basic'
  running.value=true;await nextTick();if(disposed)return
  map=L.map(canvas.value!,{zoomControl:false,attributionControl:false}).setView([49.1478,16.5803],10)
@@ -54,59 +56,59 @@ async function start(){busy.value=true;try{
  controller=core().maps.mount(host.value!,{driver:maps().adapters.leaflet(map),controls:{zoom:true,home:true,gps:false,compass:false},compassOverlay:false}) as LiveController
  map.on('dragstart',()=>{controller?.notifyManualPan();following.value=follow?.isEnabled()??false})
  resize=core().layout.observe(host.value!,{onResize:()=>map?.invalidateSize()})
- running.value=true;changeLayer();message.value='Mapa běží přes Core proxy. Posuňte ji a změňte zoom.'
+ running.value=true;changeLayer();message.value=t("The map uses the Core proxy. Pan and change the zoom.")
  }catch(e){message.value=errorText(e);await stop()}finally{busy.value=false}}
 function startGps(){try{if(!map||!controller)return;stopGps();gps.value=true
- tracker=maps().watchLocation({onPosition:s=>{if(disposed||!map)return;marker??=L.circleMarker([s.point.lat,s.point.lon],{radius:7}).addTo(map);marker.setLatLng([s.point.lat,s.point.lon]);message.value=`GPS: ${s.point.lat.toFixed(5)}, ${s.point.lon.toFixed(5)}; přesnost ${s.accuracyM??'?'} m`},onError:e=>{message.value=e.code+': '+e.message;if(e.code==='permission_denied'||e.code==='unsupported')stopGps()}})
+ tracker=maps().watchLocation({onPosition:s=>{if(disposed||!map)return;marker??=L.circleMarker([s.point.lat,s.point.lon],{radius:7}).addTo(map);marker.setLatLng([s.point.lat,s.point.lon]);message.value=`GPS: ${s.point.lat.toFixed(5)}, ${s.point.lon.toFixed(5)}; ${t("Accuracy")} ${s.accuracyM??'?'} m`},onError:e=>{message.value=e.code+': '+e.message;if(e.code==='permission_denied'||e.code==='unsupported')stopGps()}})
  follow=maps().followLocation(controller,tracker,{keepZoom:true});following.value=follow.isEnabled()
  }catch(e){stopGps();message.value=errorText(e)}}
 function recenter(){follow?.enable();following.value=follow?.isEnabled()??false}
 const probing=ref(false)
-async function testCache(){if(!map)return;probing.value=true;probe.value='Načítám stejnou dlaždici dvakrát…';try{
+async function testCache(){if(!map)return;probing.value=true;probe.value=t("Loading the same tile twice…");try{
  const z=map.getZoom(), point=map.project(map.getCenter(),z).divideBy(256).floor(),n=2**z
  const url=core().maps.tileUrl(provider.value,mapset.value,256,z,((point.x%n)+n)%n,Math.max(0,Math.min(n-1,point.y)))
  const results:string[]=[]
  for(let i=0;i<2;i++){
  const response=await fetch(url,{credentials:'same-origin',cache:'no-store',signal:AbortSignal.any([abort.signal,AbortSignal.timeout(20000)])})
  if(!response.ok)throw Error(`HTTP ${response.status}; ${response.headers.get('X-HC-Core-Map-Error')??''}; Retry-After ${response.headers.get('Retry-After')??'—'}`)
- const image=await createImageBitmap(await response.blob());image.close();results.push(response.headers.get('X-HC-Core-Map-Cache')??'neuvedeno')
+ const image=await createImageBitmap(await response.blob());image.close();results.push(response.headers.get('X-HC-Core-Map-Cache')??t("not specified"))
  }
- probe.value=`1. ${results[0]}; 2. ${results[1]}. `+(results[1]==='hit'?'Serverový cache HIT potvrzen.':'HIT nepotvrzen; výsledek není označen jako úspěšný.')
+ probe.value=`1. ${results[0]}; 2. ${results[1]}. `+(results[1]==='hit'?t("Server cache HIT confirmed."):t("HIT not confirmed; result is not marked as successful."))
  }catch(e){probe.value=errorText(e)}finally{probing.value=false}}
 async function cleanupFavorite(){if(pendingFavorite.value){await core().maps.favorites.remove(pendingFavorite.value);pendingFavorite.value=''}}
-async function testWrites(){writing.value=true;writeResult.value='Ověřuji zápis, čtení a úklid…'
+async function testWrites(){writing.value=true;writeResult.value=t("Checking writing, reading and cleanup…")
  const token=crypto.randomUUID().replaceAll('-',''),settings=core().settings.create(props.settingsUrl,'hc_pg_probe_'+token)
  let failure=''
  try{
- await settings.save({probe:token});if((await settings.load()).probe!==token)throw Error('Neshoda nastavení po načtení.')
+ await settings.save({probe:token});if((await settings.load()).probe!==token)throw Error(t("Settings mismatch after loading."))
  const favorite=await core().maps.favorites.add({name:'Playground test '+token,lat:49.1478,lon:16.5803,sourceApp:'hc_shared_app_core_playground'})
- pendingFavorite.value=String(favorite.id??'');if(!pendingFavorite.value)throw Error('Odpověď neobsahuje ID oblíbeného místa.')
+ pendingFavorite.value=String(favorite.id??'');if(!pendingFavorite.value)throw Error(t("The response contains no favorite place ID."))
  const name='Playground updated '+token;await core().maps.favorites.update(pendingFavorite.value,{name})
- if(!(await core().maps.favorites.list()).some(f=>String(f.id)===pendingFavorite.value&&f.name===name))throw Error('Neshoda oblíbeného místa po aktualizaci.')
+ if(!(await core().maps.favorites.list()).some(f=>String(f.id)===pendingFavorite.value&&f.name===name))throw Error(t("Favorite place mismatch after updating."))
  }catch(e){failure=errorText(e)}finally{
- try{await settings.save({});if(Object.keys(await settings.load()).length)throw Error('Nastavení nebylo vyprázdněno.')}catch(e){failure+=' Úklid nastavení '+errorText(e)+'; namespace hc_pg_probe_'+token}
- try{const id=pendingFavorite.value;await cleanupFavorite();if(id&&(await core().maps.favorites.list()).some(f=>String(f.id)===id)){pendingFavorite.value=id;throw Error('Místo stále existuje.')}}catch(e){failure+=' Úklid místa: '+errorText(e)}
- writeResult.value=failure||'Nastavení a oblíbené místo: zápis, čtení, aktualizace místa a úklid ověřeny.';writing.value=false
+ try{await settings.save({});if(Object.keys(await settings.load()).length)throw Error(t("Settings were not cleared."))}catch(e){failure+=t(" Settings cleanup ")+errorText(e)+'; namespace hc_pg_probe_'+token}
+ try{const id=pendingFavorite.value;await cleanupFavorite();if(id&&(await core().maps.favorites.list()).some(f=>String(f.id)===id)){pendingFavorite.value=id;throw Error(t("The place still exists."))}}catch(e){failure+=t(" Place cleanup: ")+errorText(e)}
+ writeResult.value=failure||t("Settings and favorite place: writing, reading, updating and cleanup verified.");writing.value=false
  }}
-async function retryCleanup(){try{await cleanupFavorite();writeResult.value='Testovací místo odstraněno.'}catch(e){writeResult.value=errorText(e)}}
+async function retryCleanup(){try{await cleanupFavorite();writeResult.value=t("Test place removed.")}catch(e){writeResult.value=errorText(e)}}
 onBeforeUnmount(()=>{disposed=true;void stop();/* An in-flight write completes its own finally cleanup. */})
 </script>
 <template>
 <section class="runtime-checks">
-<h2>Provozní zkoušky na tomto serveru</h2>
-<p>Spouštějí se ručně. Mapa stahuje podklady přes Core a může spotřebovat kredity providera. Zápis ověřuje pouze vlastní testovací data přihlášeného uživatele.</p>
-<button :disabled="running||busy" @click="start">Spustit skutečnou mapu</button>
-<button :disabled="!running||busy" @click="stop">Zastavit mapu a GPS</button>
-<template v-if="running"><label>Provider <select v-model="provider" @change="providerChanged"><option v-for="p in providers" :key="p.id" :value="p.id">{{p.name}}</option></select></label>
-<label>Podklad <select v-model="mapset" @change="changeLayer"><option v-for="m in providers.find(p=>p.id===provider)?.mapsets" :key="m">{{m}}</option></select></label></template>
+<h2>{{ t("Runtime tests on this server") }}</h2>
+<p>{{ t("Start manually. The map loads tiles through Core and may use provider credits. Storage tests use only the signed-in user's own test data.") }}</p>
+<button :disabled="running||busy" @click="start">{{ t("Start real map") }}</button>
+<button :disabled="!running||busy" @click="stop">{{ t("Stop map and GPS") }}</button>
+<template v-if="running"><label>{{ t("Provider") }} <select v-model="provider" @change="providerChanged"><option v-for="p in providers" :key="p.id" :value="p.id">{{p.name}}</option></select></label>
+<label>{{ t("Map layer") }} <select v-model="mapset" @change="changeLayer"><option v-for="m in providers.find(p=>p.id===provider)?.mapsets" :key="m">{{m}}</option></select></label></template>
 <div ref="host" class="live-map" v-show="running"><div ref="canvas" class="map-canvas"></div></div>
 <p v-if="running">{{providers.find(p=>p.id===provider)?.attribution}}</p>
-<button :disabled="!running||probing" @click="testCache">Ověřit serverovou cache</button>
+<button :disabled="!running||probing" @click="testCache">{{ t("Check server cache") }}</button>
 <p role="status">{{probe}}</p>
-<button :disabled="!running||gps" @click="startGps">Spustit GPS</button><button :disabled="!gps" @click="stopGps">Zastavit GPS</button><button :disabled="!gps" @click="recenter">Moje poloha / následovat</button>
-<p>GPS následování: {{following?'zapnuté':'vypnuté'}}. Ruční tažení ho vypne, zoom ho zachová. GPS se neukládá do oblíbených; pohyb mapy vyvolá požadavky na dlaždice.</p><p role="status">{{message}}</p>
-<button :disabled="writing||!!pendingFavorite" @click="testWrites">Ověřit ukládání a úklid testovacích dat</button><p role="status">{{writeResult}}</p>
-<p v-if="pendingFavorite">ID testovacího místa: {{pendingFavorite}} <button :disabled="writing" @click="retryCleanup">Dokončit úklid místa</button></p>
+<button :disabled="!running||gps" @click="startGps">{{ t("Start GPS") }}</button><button :disabled="!gps" @click="stopGps">{{ t("Stop GPS") }}</button><button :disabled="!gps" @click="recenter">{{ t("My location / follow") }}</button>
+<p>{{ t("GPS following:") }} {{following?t("on"):t("off")}}{{ t(". Manual panning disables following; zoom preserves it. GPS is not saved to favorites; moving the map requests tiles.") }}</p><p role="status">{{message}}</p>
+<button :disabled="writing||!!pendingFavorite" @click="testWrites">{{ t("Check storage and test data cleanup") }}</button><p role="status">{{writeResult}}</p>
+<p v-if="pendingFavorite">{{ t("Test place ID:") }} {{pendingFavorite}} <button :disabled="writing" @click="retryCleanup">{{ t("Complete place cleanup") }}</button></p>
 </section>
 </template>
 <style scoped>

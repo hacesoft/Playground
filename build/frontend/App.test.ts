@@ -7,6 +7,7 @@ import App from './App.vue'
 describe('Core Playground', () => {
   let editorOptions: Record<string, unknown> | undefined
   beforeEach(() => {
+    document.documentElement.lang = "cs"
     editorOptions = undefined
     const config = new Map<string, unknown>()
     window.HcSharedAppCore = {

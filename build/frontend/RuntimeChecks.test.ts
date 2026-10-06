@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
 import {mount,flushPromises} from '@vue/test-utils'
-import {describe,it,expect,vi} from 'vitest'
+import {describe,it,expect,vi,beforeEach} from 'vitest'
 import RuntimeChecks from './RuntimeChecks.vue'
 describe('manual runtime probes',()=>{
+ beforeEach(()=>{document.documentElement.lang='cs'})
  it('does not download tiles, request GPS or write on mount',()=>{
  const fetcher=vi.spyOn(globalThis,'fetch');const w=mount(RuntimeChecks,{props:{settingsUrl:'/settings'}})
  expect(fetcher).not.toHaveBeenCalled();expect(w.text()).toContain('Dosud netestováno');w.unmount();fetcher.mockRestore()

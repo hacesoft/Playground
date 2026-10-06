@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/test-manifest.mjs && vite build && node scripts/test-bundle.mjs",
-    "check": "vue-tsc --noEmit && vitest run && node scripts/test-manifest.mjs",
+    "build": "node scripts/test-languages.mjs && node scripts/test-manifest.mjs && vite build && node scripts/test-bundle.mjs",
+    "check": "vue-tsc --noEmit && vitest run && node scripts/test-manifest.mjs && node scripts/test-languages.mjs",
     "test": "vitest",
     "watch": "vite build --watch"
   },

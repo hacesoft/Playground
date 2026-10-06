@@ -5,9 +5,19 @@
     "moduleResolution": "Bundler",
     "strict": true,
     "noUncheckedIndexedAccess": true,
-    "lib": ["ESNext", "DOM"],
-    "types": ["node", "vitest/globals"]
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "types": [
+      "node",
+      "vitest/globals"
+    ],
+    "resolveJsonModule": true
   },
-  "include": ["frontend/**/*.ts", "frontend/**/*.vue", "vite.config.ts"]
+  "include": [
+    "frontend/**/*.ts",
+    "frontend/**/*.vue",
+    "vite.config.ts"
+  ]
 }
-

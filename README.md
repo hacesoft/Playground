@@ -21,3 +21,9 @@ Sekce Souběžné změny nabízí dva editory nad jedním dokumentem. Uložte A,
 Ukázka používá skutečné `core.concurrency` API, ale úložiště a HTTP 409 simuluje v paměti jedné stránky. Nejde o serverový zámek souboru ani ověření dvou skutečných uživatelů. Aplikace se sdílenými daty musí v backendu samy implementovat atomický compare-and-swap a kontrolu oprávnění. Obnovením stránky se testovací data a kopie smažou.
 
 [Core](https://github.com/hacesoft/core) · [Dokumentace](docs/) · [Licence](LICENSE)
+
+## Jazykové mutace
+
+Rozhraní Playgroundu obsahuje 11 jazyků: čeština (`cs`), angličtina (`en`), němčina (`de`), španělština (`es`), francouzština (`fr`), italština (`it`), nizozemština (`nl`), polština (`pl`), portugalština (`pt`), slovenština (`sk`) a ukrajinština (`uk`). Jazyk se určuje z nastavení uživatele Nextcloudu; regionální varianty se mapují na základní jazyk. Pro nepodporovaný jazyk i chybějící jednotlivý překlad se použije angličtina (EN). Přeložené jsou vlastní ovládání Playgroundu, stavové zprávy, dialogové popisky a ukázkový dokument editoru. Texty a chyby vytvořené přímo závislostí Core nebo serverem závisejí na lokalizaci těchto služeb; názvy API zůstávají technickými názvy. Dokumentace je pouze CZ a EN.
+
+Při každé další úpravě aplikace se ověří jazyky proti společné sadě `cs`, `en`, `de`, `es`, `fr`, `it`, `nl`, `pl`, `pt`, `sk`, `uk`. Doplní se chybějící jazyky i překladové klíče, prověří se výběr jazyka podle Nextcloudu a aktualizuje seznam skutečně podporovaných jazyků. Přítomnost souboru není důkaz úplného překladu. Návody a vývojová dokumentace se vydávají pouze česky a anglicky.

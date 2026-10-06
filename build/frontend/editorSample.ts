@@ -1,1 +1,25 @@
-export const editorSample = "# Zkouška editoru\n\nTento text vložte do nové stránky. Vpravo v živém náhledu se má první řádek zobrazit jako velký nadpis. Po uložení přepněte na Náhled a zpět na Editor.\n\n## Základní formátování\n\n**Tučné písmo**\n\n*Text kurzívou*\n\n<u>Podtržený text</u>\n\n~~Přeškrtnutý text~~\n\n<mark>Zvýrazněný text</mark>\n\n<span style=\"color:#c21f3a\">Vlastní červená barva</span>\n\n<span style=\"font-family:Georgia\">Písmo Georgia</span>\n\nZde je `krátký kód` uvnitř věty.\n\n### Seznamy\n\n- První odrážka\n- Druhá odrážka\n- [ ] Nesplněný úkol\n- [x] Splněný úkol\n\n1. První číslovaný bod\n2. Druhý číslovaný bod\n\n> Tohle je citace v odsazeném bloku.\n\n---\n\n| Funkce | Očekávaný výsledek |\n| --- | --- |\n| Kurzíva | Šikmé písmo |\n| Podtržení | Čára pod textem |\n| H1 | Velký nadpis nahoře |\n\n```js\nconst zprava = 'Kód se zobrazí jako text';\nconsole.log(zprava);\n```\n\n## Odkazy, emoji a obrázek\n\n[Otevřít Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Example.jpg)\n\nEmoji z vloženého textu: 😀 🌳 🧭 ❤️ 🇨🇿\n\n![Zkušební obrázek z Wikimedia Commons](https://upload.wikimedia.org/wikipedia/commons/a/a9/Example.jpg)\n\nZdroj obrázku: [Wikimedia Commons, volné dílo](https://commons.wikimedia.org/wiki/File:Example.jpg).\n\n## Co vyzkoušet přímo tlačítky\n\n1. Označte v této větě slovo „tlačítky“ a postupně zkuste B, I, U, barvu a písmo. Vlevo se změní zápis, vpravo vzhled.\n2. Klikněte do samostatného řádku a v nabídce Nadpis vyberte H1. Tento řádek se v náhledu zvětší.\n3. Otevřete ☺, vyberte kategorii a vložte další emoji. Otevřete ▧, vyhledejte fotografii a zkontrolujte vložený odkaz na zdroj.\n4. Klikněte na 🖼 a vyberte svůj soubor PNG/JPEG. Po nahrání se v textu objeví `![název](../media/...)` a v náhledu se zobrazí obrázek. Nakonec stránku uložte a znovu otevřete.\n"
+export const editorSampleCs = "# Zkouška editoru\n\nTento text vložte do nové stránky. Vpravo v živém náhledu se má první řádek zobrazit jako velký nadpis. Po uložení přepněte na Náhled a zpět na Editor.\n\n## Základní formátování\n\n**Tučné písmo**\n\n*Text kurzívou*\n\n<u>Podtržený text</u>\n\n~~Přeškrtnutý text~~\n\n<mark>Zvýrazněný text</mark>\n\n<span style=\"color:#c21f3a\">Vlastní červená barva</span>\n\n<span style=\"font-family:Georgia\">Písmo Georgia</span>\n\nZde je `krátký kód` uvnitř věty.\n\n### Seznamy\n\n- První odrážka\n- Druhá odrážka\n- [ ] Nesplněný úkol\n- [x] Splněný úkol\n\n1. První číslovaný bod\n2. Druhý číslovaný bod\n\n> Tohle je citace v odsazeném bloku.\n\n---\n\n| Funkce | Očekávaný výsledek |\n| --- | --- |\n| Kurzíva | Šikmé písmo |\n| Podtržení | Čára pod textem |\n| H1 | Velký nadpis nahoře |\n\n```js\nconst zprava = 'Kód se zobrazí jako text';\nconsole.log(zprava);\n```\n\n## Odkazy, emoji a obrázek\n\n[Otevřít Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Example.jpg)\n\nEmoji z vloženého textu: 😀 🌳 🧭 ❤️ 🇨🇿\n\n![Zkušební obrázek z Wikimedia Commons](https://upload.wikimedia.org/wikipedia/commons/a/a9/Example.jpg)\n\nZdroj obrázku: [Wikimedia Commons, volné dílo](https://commons.wikimedia.org/wiki/File:Example.jpg).\n\n## Co vyzkoušet přímo tlačítky\n\n1. Označte v této větě slovo „tlačítky“ a postupně zkuste B, I, U, barvu a písmo. Vlevo se změní zápis, vpravo vzhled.\n2. Klikněte do samostatného řádku a v nabídce Nadpis vyberte H1. Tento řádek se v náhledu zvětší.\n3. Otevřete ☺, vyberte kategorii a vložte další emoji. Otevřete ▧, vyhledejte fotografii a zkontrolujte vložený odkaz na zdroj.\n4. Klikněte na 🖼 a vyberte svůj soubor PNG/JPEG. Po nahrání se v textu objeví `![název](../media/...)` a v náhledu se zobrazí obrázek. Nakonec stránku uložte a znovu otevřete.\n"
+
+import { language, t } from './i18n'
+/** Preserves the original Czech fixture and covers the same editor syntax in all locales. */
+export function editorSample(): string {
+  if (language() === 'cs') return editorSampleCs
+  return [
+    '# '+t('Editor test'),t('Editor instructions'),'## '+t('Formatting'),
+    '**'+t('Bold')+'**','*'+t('Italic')+'*','<u>'+t('Underline')+'</u>',
+    '~~'+t('Strikethrough')+'~~','<mark>'+t('Highlight')+'</mark>',
+    '<span style="color:#c21f3a">'+t('Text color')+'</span>',
+    '<span style="font-family:Georgia">'+t('Font')+' Georgia</span>',
+    '`'+t('Inline code')+'`','### '+t('Bullet list'),
+    '- '+t('First item')+'\n- '+t('Second item')+'\n- [ ] '+t('Incomplete task')+'\n- [x] '+t('Completed task'),
+    '1. '+t('First item')+'\n2. '+t('Second item'),'> '+t('Quote'),'---',
+    '| '+t('Formatting')+' | '+t('Preview')+' |\n| --- | --- |\n| '+t('Italic')+' | '+t('Italic')+' |\n| '+t('Underline')+' | '+t('Underline')+' |\n| H1 | '+t('Heading')+' |',
+    "```js\nconst message = 'Code is displayed as text';\nconsole.log(message);\n```",
+    '## '+t('Link')+', emoji, '+t('Image'),
+    '[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Example.jpg)',
+    '😀 🌳 🧭 ❤️ 🇨🇿',
+    '!['+t('Image')+'](https://upload.wikimedia.org/wikipedia/commons/a/a9/Example.jpg)',
+    t('Source')+': [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Example.jpg).',
+    '## '+t('Example tools'),t('Editor button instructions'),'`!['+t('Image')+'](../media/...)`',
+  ].join('\n\n')+'\n'
+}
