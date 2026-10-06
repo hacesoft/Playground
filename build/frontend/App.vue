@@ -558,9 +558,9 @@ function mountAboutInfo(): void {
     id: 'hc_shared_app_core_playground',
     name: 'Shared App Core Playground',
     version: props.playgroundVersion,
-    repository: 'https://github.com/hacesoft/hc-shared-app-core-playground',
-    releaseNotes: 'https://github.com/hacesoft/hc-shared-app-core-playground/releases',
-    documentation: 'https://github.com/hacesoft/hc-shared-app-core-playground#readme',
+    repository: 'https://github.com/hacesoft/Playground',
+    releaseNotes: 'https://github.com/hacesoft/Playground/releases',
+    documentation: 'https://github.com/hacesoft/Playground#readme',
   })
   aboutController = oCore.about.mount(oHost, { endpoint: props.coreReleaseUrl })
 }

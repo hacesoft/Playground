@@ -12,4 +12,4 @@ Two editors share an in-memory test document. Save A, then save changed B with i
 
 The demo uses real `core.concurrency` helpers but simulates persistence and HTTP 409 in one browser page. It is not a server-side file lock or a real two-user integration test. Consumers must implement atomic compare-and-swap and permission checks in their backend. Reloading discards the test document and copies.
 
-[Core](https://github.com/hacesoft/hc-shared-app-core) · [Documentation](docs/) · [License](LICENSE)
+[Core](https://github.com/hacesoft/core) · [Documentation](docs/) · [License](LICENSE)

@@ -7,7 +7,7 @@ const fShowStartupError = (oTarget: HTMLElement, sMessage: string): void => {
   oPanel.setAttribute('role', 'alert')
   const oHeading = document.createElement('h2'); oHeading.textContent = 'Playground nelze spustit'
   const oDetail = document.createElement('p'); oDetail.textContent = sMessage
-  const oLink = document.createElement('a'); oLink.href = 'https://github.com/hacesoft/hc-shared-app-core/releases'; oLink.textContent = 'Stáhnout Shared App Core'
+  const oLink = document.createElement('a'); oLink.href = 'https://github.com/hacesoft/core/releases'; oLink.textContent = 'Stáhnout Shared App Core'
   oPanel.append(oHeading, oDetail, oLink); oTarget.replaceChildren(oPanel)
 }
 

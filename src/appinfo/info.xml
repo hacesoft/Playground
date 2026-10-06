@@ -13,9 +13,9 @@ It is intended for development installations, not ordinary end users.
     <licence>AGPL-3.0-or-later</licence>
     <author>Pavel Procházka</author>
     <category>tools</category>
-    <website>https://github.com/hacesoft/hc-shared-app-core-playground</website>
-    <bugs>https://github.com/hacesoft/hc-shared-app-core-playground/issues</bugs>
-    <repository>https://github.com/hacesoft/hc-shared-app-core-playground</repository>
+    <website>https://github.com/hacesoft/Playground</website>
+    <bugs>https://github.com/hacesoft/Playground/issues</bugs>
+    <repository>https://github.com/hacesoft/Playground</repository>
     <dependencies>
         <nextcloud min-version="35" max-version="35"/>
     </dependencies>

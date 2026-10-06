@@ -26,7 +26,7 @@ final class PageController extends Controller {
     public function index(): TemplateResponse {
         $contract = json_decode((string)file_get_contents(__DIR__ . '/../../appinfo/hc_shared_app_core.json'), true, 512, JSON_THROW_ON_ERROR);
         $requiredCoreVersion = (string)($contract['requiredVersion'] ?? '');
-        $coreDownloadUrl = (string)($contract['downloadUrl'] ?? 'https://github.com/hacesoft/hc-shared-app-core/releases');
+        $coreDownloadUrl = (string)($contract['downloadUrl'] ?? 'https://github.com/hacesoft/core/releases');
         $response = new TemplateResponse(Application::APP_ID, 'main', [
             'playgroundVersion' => Application::VERSION,
             'requiredCoreVersion' => $requiredCoreVersion,

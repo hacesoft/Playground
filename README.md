@@ -12,4 +12,4 @@ Sekce Souběžné změny nabízí dva editory nad jedním dokumentem. Uložte A,
 
 Ukázka používá skutečné `core.concurrency` API, ale úložiště a HTTP 409 simuluje v paměti jedné stránky. Nejde o serverový zámek souboru ani ověření dvou skutečných uživatelů. Aplikace se sdílenými daty musí v backendu samy implementovat atomický compare-and-swap a kontrolu oprávnění. Obnovením stránky se testovací data a kopie smažou.
 
-[Core](https://github.com/hacesoft/hc-shared-app-core) · [Dokumentace](docs/) · [Licence](LICENSE)
+[Core](https://github.com/hacesoft/core) · [Dokumentace](docs/) · [Licence](LICENSE)
