@@ -1,0 +1,27 @@
+{
+  "name": "hc-shared-app-core-playground",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/test-manifest.mjs && vite build && node scripts/test-bundle.mjs",
+    "check": "vue-tsc --noEmit && vitest run && node scripts/test-manifest.mjs",
+    "test": "vitest",
+    "watch": "vite build --watch"
+  },
+  "dependencies": {
+    "leaflet": "1.9.4",
+    "vue": "^3.5.20"
+  },
+  "devDependencies": {
+    "@types/leaflet": "1.9.21",
+    "@types/node": "^24.3.0",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/test-utils": "^2.4.6",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.3",
+    "vitest": "^3.2.4",
+    "vue-tsc": "^3.0.6"
+  }
+}
