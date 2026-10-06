@@ -2,6 +2,14 @@
 
 # Shared App Core Playground 1.0.0
 
+## Povinná závislost: Hacesoft Core
+
+**Playground bez nainstalovaného a zapnutého Core nefunguje.** Vyžaduje **Core 0.18.0-dev.16 nebo novější**. Core poskytuje společné služby a komponenty, které Playground předvádí.
+
+**Repozitář Core: [https://github.com/hacesoft/core](https://github.com/hacesoft/core)**
+
+Nejprve nainstalujte a zapněte Core podle jeho návodu. Potom nainstalujte Playground. Core je samostatná aplikace a není přibalené v tomto archivu.
+
 Samostatná demonstrační a testovací aplikace pro Nextcloud 35 a Shared App Core >= 0.18.0-dev.16. Umožňuje vyzkoušet layout, formuláře, editor, mapové služby, seznamy a další služby Core. Instalujte odděleně od Core.
 
 Rozbalte celý balíček a spusťte `sudo sh install.sh`. Obsahuje sestavený runtime, zdroje, dokumentaci a `uninstall.sh`. `sh build-release.sh` aplikaci znovu sestaví. Provozní ověření na NASu není součástí lokálních automatických testů.
