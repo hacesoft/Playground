@@ -320,7 +320,9 @@
     "Navigation": "Navigatie",
     "Success": "Succes",
     "Info": "Informatie",
-    "Warning": "Waarschuwing"
+    "Warning": "Waarschuwing",
+    "About": "Over de app",
+    "Check for updates": "Controleren op updates"
   },
   "pluralForm": "nplurals=2; plural=(n != 1);"
 }

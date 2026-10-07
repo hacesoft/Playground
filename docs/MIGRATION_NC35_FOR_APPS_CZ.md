@@ -1,4 +1,4 @@
-[🇨🇿 Česky](../README.md) | [🇬🇧 English](../README_EN.md)
+[🇨🇿 Česky](../README_CZ.md) | [🇬🇧 English](../README.md)
 
 # Závazné pokyny pro aplikace: NC34 → NC35
 

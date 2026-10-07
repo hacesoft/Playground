@@ -1,4 +1,4 @@
-[🇨🇿 Česky](../README.md) | [🇬🇧 English](../README_EN.md)
+[🇨🇿 Česky](../README_CZ.md) | [🇬🇧 English](../README.md)
 
 # Playground 0.18.0-dev.7 – provozní zkoušky
 

@@ -320,7 +320,9 @@
     "Navigation": "Navigace",
     "Success": "Úspěch",
     "Info": "Informace",
-    "Warning": "Varování"
+    "Warning": "Varování",
+    "About": "O aplikaci",
+    "Check for updates": "Zkontrolovat aktualizace"
   },
   "en": {
     "No action has been performed yet.": "No action has been performed yet.",
@@ -643,7 +645,9 @@
     "Navigation": "Navigation",
     "Success": "Success",
     "Info": "Info",
-    "Warning": "Warning"
+    "Warning": "Warning",
+    "About": "About",
+    "Check for updates": "Check for updates"
   },
   "de": {
     "Preview": "Vorschau",
@@ -966,7 +970,9 @@
     "Navigation": "Navigation",
     "Success": "Erfolg",
     "Info": "Information",
-    "Warning": "Warnung"
+    "Warning": "Warnung",
+    "About": "Über die Anwendung",
+    "Check for updates": "Nach Updates suchen"
   },
   "es": {
     "Undo": "Deshacer",
@@ -1289,7 +1295,9 @@
     "Navigation": "Navegación",
     "Success": "Éxito",
     "Info": "Información",
-    "Warning": "Advertencia"
+    "Warning": "Advertencia",
+    "About": "Acerca de",
+    "Check for updates": "Buscar actualizaciones"
   },
   "fr": {
     "Undo": "Annuler",
@@ -1612,7 +1620,9 @@
     "Navigation": "Navigation",
     "Success": "Succès",
     "Info": "Information",
-    "Warning": "Avertissement"
+    "Warning": "Avertissement",
+    "About": "À propos",
+    "Check for updates": "Rechercher des mises à jour"
   },
   "it": {
     "Undo": "Annulla",
@@ -1935,7 +1945,9 @@
     "Navigation": "Navigazione",
     "Success": "Successo",
     "Info": "Informazioni",
-    "Warning": "Avviso"
+    "Warning": "Avviso",
+    "About": "Informazioni",
+    "Check for updates": "Controlla aggiornamenti"
   },
   "nl": {
     "Undo": "Ongedaan maken",
@@ -2258,7 +2270,9 @@
     "Navigation": "Navigatie",
     "Success": "Succes",
     "Info": "Informatie",
-    "Warning": "Waarschuwing"
+    "Warning": "Waarschuwing",
+    "About": "Over de app",
+    "Check for updates": "Controleren op updates"
   },
   "pl": {
     "Undo": "Cofnij",
@@ -2581,7 +2595,9 @@
     "Navigation": "Nawigacja",
     "Success": "Sukces",
     "Info": "Informacje",
-    "Warning": "Ostrzeżenie"
+    "Warning": "Ostrzeżenie",
+    "About": "O aplikacji",
+    "Check for updates": "Sprawdź aktualizacje"
   },
   "pt": {
     "Confirm action": "Confirmar ação",
@@ -2904,7 +2920,9 @@
     "Navigation": "Navegação",
     "Success": "Sucesso",
     "Info": "Informação",
-    "Warning": "Aviso"
+    "Warning": "Aviso",
+    "About": "Sobre",
+    "Check for updates": "Verificar atualizações"
   },
   "sk": {
     "Preview": "Náhľad",
@@ -3227,7 +3245,9 @@
     "Navigation": "Navigácia",
     "Success": "Úspech",
     "Info": "Informácie",
-    "Warning": "Varovanie"
+    "Warning": "Varovanie",
+    "About": "O aplikácii",
+    "Check for updates": "Skontrolovať aktualizácie"
   },
   "uk": {
     "Confirm action": "Підтвердити дію",
@@ -3550,6 +3570,8 @@
     "Navigation": "Навігація",
     "Success": "Успіх",
     "Info": "Інформація",
-    "Warning": "Попередження"
+    "Warning": "Попередження",
+    "About": "Про застосунок",
+    "Check for updates": "Перевірити оновлення"
   }
 }

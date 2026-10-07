@@ -320,7 +320,9 @@
     "Navigation": "Navegação",
     "Success": "Sucesso",
     "Info": "Informação",
-    "Warning": "Aviso"
+    "Warning": "Aviso",
+    "About": "Sobre",
+    "Check for updates": "Verificar atualizações"
   },
   "pluralForm": "nplurals=2; plural=(n != 1);"
 }

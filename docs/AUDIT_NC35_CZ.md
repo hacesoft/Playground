@@ -1,10 +1,10 @@
-[🇨🇿 Česky](../README.md) | [🇬🇧 English](../README_EN.md)
+[🇨🇿 Česky](../README_CZ.md) | [🇬🇧 English](../README.md)
 
-# Dodatek: oprava Playground 0.18.0-dev.2
+# Dodatek: oprava Playground 0.18.1
 
 Zjištěno při nasazení uživatelem na NC35.0.0: Core i Playground byly povolené, UI skončilo na „Nekompatibilní API Shared App Core.“ Dodaný manifest Playgroundu dev.1 neměl requiredApiVersion. PageController předal fallback0 a frontend jej porovnal s Core apiVersion1. Jde o chybu balíku Playgroundu; nezjišťuje změnu API Nextcloudu.
 
-Oprava přidává explicitní numeric requiredApiVersion1. Minimum Core zůstává0.18.0-dev.1; appVersion Playgroundu je0.18.0-dev.2. Nový test manifestu na původním souboru reprodukoval selhání. Společný bundle test už plní DOM parametry ze skutečného manifestu, nikoli ručně zadanou jedničkou. Původní testy PHP řetězec neprováděly, a proto bylo předchozí ověření nedostatečné. PHP binding je nyní staticky kontrolován, skutečný webový běh zůstává k ověření na NASu.
+Oprava přidává explicitní numeric requiredApiVersion1. Minimum Core zůstává0.18.0-dev.1; appVersion Playgroundu je0.18.1. Nový test manifestu na původním souboru reprodukoval selhání. Společný bundle test už plní DOM parametry ze skutečného manifestu, nikoli ručně zadanou jedničkou. Původní testy PHP řetězec neprováděly, a proto bylo předchozí ověření nedostatečné. PHP binding je nyní staticky kontrolován, skutečný webový běh zůstává k ověření na NASu.
 
 Následuje historický audit dev.1 (jeho původní PASS není potvrzením bezchybné dodávky).
 

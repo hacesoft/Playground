@@ -320,7 +320,9 @@
     "Navigation": "Навігація",
     "Success": "Успіх",
     "Info": "Інформація",
-    "Warning": "Попередження"
+    "Warning": "Попередження",
+    "About": "Про застосунок",
+    "Check for updates": "Перевірити оновлення"
   },
   "pluralForm": "nplurals=2; plural=(n != 1);"
 }

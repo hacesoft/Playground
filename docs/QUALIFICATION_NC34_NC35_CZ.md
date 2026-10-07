@@ -1,4 +1,4 @@
-[🇨🇿 Česky](../README.md) | [🇬🇧 English](../README_EN.md)
+[🇨🇿 Česky](../README_CZ.md) | [🇬🇧 English](../README.md)
 
 # Provozní kvalifikace NC34 a NC35
 

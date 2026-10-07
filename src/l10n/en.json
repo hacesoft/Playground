@@ -320,7 +320,9 @@
     "Navigation": "Navigation",
     "Success": "Success",
     "Info": "Info",
-    "Warning": "Warning"
+    "Warning": "Warning",
+    "About": "About",
+    "Check for updates": "Check for updates"
   },
   "pluralForm": "nplurals=2; plural=(n != 1);"
 }

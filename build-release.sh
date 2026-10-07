@@ -23,7 +23,7 @@ find "$RELEASE" -maxdepth 1 -type f \( -name "$APP_ID-*.zip" -o -name "$APP_ID-*
 find "$RELEASE" -maxdepth 1 -type f -name 'hc-shared-app-core-playground-*-full-source.zip' -delete
 for item in $RUNTIME_ITEMS; do cp -R "$SRC/$item" "$APP/$item"; done
 cp "$ROOT/LICENSE" "$APP/LICENSE"
-(cd "$ROOT" && tar --exclude='build/node_modules' -cf - .gitignore LICENSE README.md README_EN.md install.sh uninstall.sh build-release.sh build docs scripts src) | (cd "$SOURCE" && tar -xf -)
+(cd "$ROOT" && tar --exclude='build/node_modules' -cf - .gitignore LICENSE README.md README_CZ.md install.sh uninstall.sh build-release.sh build docs scripts src) | (cd "$SOURCE" && tar -xf -)
 (
  cd "$STAGE"
  tar -czf "$RELEASE/$APP_ID-$VERSION.tar.gz" "$APP_ID"

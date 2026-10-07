@@ -79,6 +79,12 @@ let formController: FormController | null = null
 let pickerController: PickerController | null = null
 let layoutController: LayoutController | null = null
 let aboutController: AboutController | null = null
+const checkingUpdates = ref(false)
+async function refreshUpdates(): Promise<void> {
+  if (!aboutController || checkingUpdates.value) return
+  checkingUpdates.value = true
+  try { await aboutController.refresh() } finally { checkingUpdates.value = false }
+}
 let mapController: MapController | null = null
 let nMapDiagnosticsTimer: number | null = null
 
@@ -561,10 +567,10 @@ function mountAboutInfo(): void {
     name: 'Shared App Core Playground',
     version: props.playgroundVersion,
     repository: 'https://github.com/hacesoft/Playground',
-    releaseNotes: 'https://github.com/hacesoft/Playground/releases',
+    releaseNotes: 'https://github.com/hacesoft/Playground/tree/HEAD/release',
     documentation: 'https://github.com/hacesoft/Playground#readme',
   })
-  aboutController = oCore.about.mount(oHost, { endpoint: props.coreReleaseUrl })
+  aboutController = oCore.about.mount(oHost, { endpoint: props.coreReleaseUrl, heading: t("About") })
 }
 
 function mountMapDemo(): void {
@@ -638,6 +644,18 @@ onBeforeUnmount(() => {
       </div>
       <div class="version-badge">Playground {{ playgroundVersion }}</div>
     </header>
+
+    <section class="about-demo" aria-labelledby="playground-about-title">
+      <div class="demo-heading">
+        <div>
+          
+          <h2 id="playground-about-title">{{ t("About") }}</h2>
+          <p>{{ t("Consistent information about the app, Core and available GitHub versions.") }}</p>
+        </div>
+        <button type="button" :disabled="checkingUpdates" @click="refreshUpdates">{{ t("Check for updates") }}</button>
+      </div>
+      <div ref="aboutHost"></div>
+    </section>
 
     <section class="summary" :class="{ success: allPassed }">
       <div class="summary-icon">{{ allPassed ? '✓' : running ? '…' : '!' }}</div>
@@ -847,16 +865,7 @@ onBeforeUnmount(() => {
         {{ layoutMetrics?.width ?? '—' }} × {{ layoutMetrics?.height ?? '—' }} {{ t("px · mode") }} <strong>{{ layoutMetrics?.mode ?? '—' }}</strong> {{ t("· resize event ready") }} </p>
     </section>
 
-    <section class="about-demo">
-      <div class="demo-heading">
-        <div>
-          <p class="eyebrow">{{ t("Eighth shared component") }}</p>
-          <h2>About & Update Service</h2>
-          <p>{{ t("Consistent information about the app, Core and available GitHub versions.") }}</p>
-        </div>
-      </div>
-      <div ref="aboutHost"></div>
-    </section>
+
 
     <section class="settings-demo">
       <h2>{{ t("Shared editor") }}</h2>

@@ -5,10 +5,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App.vue'
 
 describe('Core Playground', () => {
+  const aboutRefresh = vi.fn(async () => ({ app: {}, core: {} }))
   let editorOptions: Record<string, unknown> | undefined
   beforeEach(() => {
     document.documentElement.lang = "cs"
     editorOptions = undefined
+    aboutRefresh.mockClear()
     const config = new Map<string, unknown>()
     window.HcSharedAppCore = {
       version: '1.0.0',
@@ -132,7 +134,7 @@ describe('Core Playground', () => {
           row.className = 'hc-shared-app-core-about__row'
           row.textContent = 'Core Playground Shared App Core'
           element.append(row)
-          return { element, refresh: async () => ({ app: {}, core: {} }), destroy: vi.fn() }
+          return { element, refresh: aboutRefresh, destroy: vi.fn() }
         },
       },
       maps: {
@@ -185,5 +187,12 @@ describe('Core Playground', () => {
     expect(editorOptions).toMatchObject({ embedImages: true, showPreview: true, splitView: true })
     expect(editorOptions?.translate).toBeTypeOf('function')
     expect(editorOptions?.value).toContain('- [ ] Nesplněný úkol')
+    const panel = wrapper.find('.about-demo')
+    expect(panel.element.previousElementSibling?.className).toBe('hero')
+    expect(panel.find('h2').text()).toBe('O aplikaci')
+    const refresh = panel.find('button')
+    expect(refresh.text()).toBe('Zkontrolovat aktualizace')
+    await refresh.trigger('click')
+    expect(aboutRefresh).toHaveBeenCalledOnce()
   })
 })

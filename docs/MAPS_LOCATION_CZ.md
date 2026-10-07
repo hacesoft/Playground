@@ -1,4 +1,4 @@
-[🇨🇿 Česky](../README.md) | [🇬🇧 English](../README_EN.md)
+[🇨🇿 Česky](../README_CZ.md) | [🇬🇧 English](../README.md)
 
 # Poloha a následování mapou — Core 0.17.0
 

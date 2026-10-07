@@ -320,7 +320,9 @@
     "Navigation": "Navigácia",
     "Success": "Úspech",
     "Info": "Informácie",
-    "Warning": "Varovanie"
+    "Warning": "Varovanie",
+    "About": "O aplikácii",
+    "Check for updates": "Skontrolovať aktualizácie"
   },
   "pluralForm": "nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;"
 }
